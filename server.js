@@ -2,7 +2,7 @@ require("dotenv").config();
 const generateSlots = require("./services/availability");
 const express = require("express");
 const calendar = require("./services/calendar");
-const openai = require("./services/openai");
+// const openai = require("./services/openai");
 const app = express();
 app.use(express.json());
 app.get("/", (req,res)=>{
@@ -149,48 +149,48 @@ console.log("Generated slots:", formattedSlots);
     res.status(500).send(error.message);
   }
 });
-app.post("/chat", async (req, res) => {
-  try {
-    const { message } = req.body;
+// app.post("/chat", async (req, res) => {
+//   try {
+//     const { message } = req.body;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `
-You are Nebo IT Solutions AI assistant.
+//     const completion = await openai.chat.completions.create({
+//       model: "gpt-4o-mini",
+//       messages: [
+//         {
+//           role: "system",
+//           content: `
+// You are Nebo IT Solutions AI assistant.
 
-Services:
-- AI Automation
-- Website Development
-- Mobile Apps
-- CRM Solutions
+// Services:
+// - AI Automation
+// - Website Development
+// - Mobile Apps
+// - CRM Solutions
 
-If user wants a meeting,
-tell them you can help schedule one.
-`
-        },
-        {
-          role: "user",
-          content: message
-        }
-      ]
-    });
+// If user wants a meeting,
+// tell them you can help schedule one.
+// `
+//         },
+//         {
+//           role: "user",
+//           content: message
+//         }
+//       ]
+//     });
 
-    res.json({
-      reply: completion.choices[0].message.content
-    });
+//     res.json({
+//       reply: completion.choices[0].message.content
+//     });
 
-  } catch (error) {
-    console.error(error);
+//   } catch (error) {
+//     console.error(error);
 
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
+//     res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// });
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
