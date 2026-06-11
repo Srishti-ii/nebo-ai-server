@@ -3,21 +3,19 @@ const { google } = require("googleapis");
 if (!process.env.GOOGLE_CREDENTIALS_BASE64) {
   throw new Error("GOOGLE_CREDENTIALS_BASE64 is missing");
 }
-let credentials;
 
-try {
-  const decoded = Buffer.from(
-    process.env.GOOGLE_CREDENTIALS_BASE64,
-    "base64"
-  ).toString("utf-8");
+const decoded = Buffer.from(
+  process.env.GOOGLE_CREDENTIALS_BASE64,
+  "base64"
+).toString("utf-8");
 
-  credentials = JSON.parse(decoded);
-} catch (err) {
-  throw new Error("Invalid GOOGLE_CREDENTIALS_BASE64 format");
-}
+const parsed = JSON.parse(decoded);
+console.log("KEY CHECK START:", parsed.private_key.slice(0, 50));
+console.log("KEY CHECK MIDDLE:", parsed.private_key.includes("BEGIN PRIVATE KEY"));
+console.log("KEY CHECK END:", parsed.private_key.slice(-50));
 
 const auth = new google.auth.GoogleAuth({
-  credentials,
+  credentials: parsed,
   scopes: ["https://www.googleapis.com/auth/calendar"],
 });
 
