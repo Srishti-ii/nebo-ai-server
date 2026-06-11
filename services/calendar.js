@@ -1,5 +1,7 @@
 const { google } = require("googleapis");
-
+if (!process.env.GOOGLE_CREDENTIALS_JSON) {
+  throw new Error("GOOGLE_CREDENTIALS_JSON is missing");
+}
 const credentials = JSON.parse(
   process.env.GOOGLE_CREDENTIALS_JSON
 );
