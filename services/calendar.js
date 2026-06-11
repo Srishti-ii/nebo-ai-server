@@ -1,14 +1,19 @@
 const { google } = require("googleapis");
 
-if (!process.env.GOOGLE_CREDENTIALS_JSON) {
-  throw new Error("GOOGLE_CREDENTIALS_JSON is missing");
+if (!process.env.GOOGLE_CREDENTIALS_BASE64) {
+  throw new Error("GOOGLE_CREDENTIALS_BASE64 is missing");
 }
-
 let credentials;
+
 try {
-  credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+  const decoded = Buffer.from(
+    process.env.GOOGLE_CREDENTIALS_BASE64,
+    "base64"
+  ).toString("utf-8");
+
+  credentials = JSON.parse(decoded);
 } catch (err) {
-  throw new Error("Invalid GOOGLE_CREDENTIALS_JSON format");
+  throw new Error("Invalid GOOGLE_CREDENTIALS_BASE64 format");
 }
 
 const auth = new google.auth.GoogleAuth({
