@@ -1,4 +1,5 @@
-
+const cors = require("cors");
+app.use(cors());
 const generateSlots = require("./services/availability");
 const express = require("express");
 const calendar = require("./services/calendar");
@@ -82,25 +83,56 @@ const start = new Date(slot);
 const end = new Date(start);
 end.setMinutes(end.getMinutes() + 30);
 
-    const event = {
-      summary: `Consultation - ${name}`,
+   const event = {
+  summary: `Consultation - ${name}`,
 
-      description: `
+  description: `
 Email: ${email}
 Service: ${service}
-      `,
+  `,
 
-      start: {
-        dateTime: start.toISOString(),
-        timeZone: "Asia/Kolkata",
-      },
+  start: {
+    dateTime: start.toISOString(),
+    timeZone: "Asia/Kolkata",
+  },
 
-      end: {
-        dateTime: end.toISOString(),
-        timeZone: "Asia/Kolkata",
-      },
+  end: {
+    dateTime: end.toISOString(),
+    timeZone: "Asia/Kolkata",
+  },
+};
 
-    };
+// FINAL AVAILABILITY CHECK
+const existingEvents = await calendar.events.list({
+  calendarId: process.env.GOOGLE_CALENDAR_ID,
+  timeMin: start.toISOString(),
+  timeMax: end.toISOString(),
+  singleEvents: true,
+});
+
+const conflict = existingEvents.data.items.some(existingEvent => {
+  if (
+    !existingEvent.start?.dateTime ||
+    !existingEvent.end?.dateTime
+  ) {
+    return false;
+  }
+
+  const eventStart = new Date(existingEvent.start.dateTime);
+  const eventEnd = new Date(existingEvent.end.dateTime);
+
+  return (
+    start < eventEnd &&
+    end > eventStart
+  );
+});
+
+if (conflict) {
+  return res.status(409).json({
+    success: false,
+    message: "This slot has already been booked. Please choose another time.",
+  });
+}
 const response = await calendar.events.insert({
   calendarId: process.env.GOOGLE_CALENDAR_ID,
   resource: event,
@@ -135,12 +167,13 @@ app.get("/available-slots", async (req, res) => {
 
     const slots = generateSlots(result.data.items);
 
-    const formattedSlots = slots.map(slot =>
-      slot.toLocaleString("en-IN", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      })
-    );
+    const formattedSlots = slots.map(slot => ({
+  value: slot.toISOString(),
+  label: slot.toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }),
+}));
 console.log("Generated slots:", formattedSlots);
     res.json(formattedSlots);
 
