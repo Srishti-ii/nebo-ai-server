@@ -68,10 +68,11 @@ app.get("/create-test-meeting", async (req, res) => {
     };
 
     const response = await calendar.events.insert({
-      calendarId: process.env.GOOGLE_CALENDAR_ID,
-      conferenceDataVersion: 1,
-      resource: event,
-    });
+  calendarId: process.env.GOOGLE_CALENDAR_ID,
+  resource: event,
+  conferenceDataVersion: 1,
+  sendUpdates: "all",
+});
 
    console.log(JSON.stringify(response.data, null, 2));
 
@@ -97,13 +98,19 @@ const start = new Date(slot);
 const end = new Date(start);
 end.setMinutes(end.getMinutes() + 30);
 
-   const event = {
+  const event = {
   summary: `Consultation - ${name}`,
 
   description: `
 Email: ${email}
 Service: ${service}
   `,
+
+  attendees: [
+    {
+      email: email
+    }
+  ],
 
   start: {
     dateTime: start.toISOString(),
@@ -113,6 +120,12 @@ Service: ${service}
   end: {
     dateTime: end.toISOString(),
     timeZone: "Asia/Kolkata",
+  },
+
+  conferenceData: {
+    createRequest: {
+      requestId: Date.now().toString(),
+    },
   },
 };
 
@@ -152,14 +165,17 @@ console.log("BOOKING EVENT:", event);
 const response = await calendar.events.insert({
   calendarId: process.env.GOOGLE_CALENDAR_ID,
   resource: event,
+  conferenceDataVersion: 1,
+  sendUpdates: "all",
 });
 
 console.log("GOOGLE RESPONSE:", response.data);
 
-    res.json({
+   res.json({
   success: true,
   eventId: response.data.id,
-  bookedSlot: start.toISOString(),
+  meetLink: response.data.hangoutLink,
+  calendarLink: response.data.htmlLink,
 });
 
   } catch (error) {
