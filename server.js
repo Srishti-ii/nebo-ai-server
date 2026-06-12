@@ -1,4 +1,4 @@
-require("dotenv").config();
+
 const generateSlots = require("./services/availability");
 const express = require("express");
 const calendar = require("./services/calendar");
