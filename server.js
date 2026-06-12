@@ -1,5 +1,15 @@
 const cors = require("cors");
-app.use(cors());
+const cors = require("cors");
+
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://your-frontend-domain.com"
+  ],
+  methods: ["GET", "POST", "OPTIONS"],
+  credentials: true
+}));
 const generateSlots = require("./services/availability");
 const express = require("express");
 const calendar = require("./services/calendar");
