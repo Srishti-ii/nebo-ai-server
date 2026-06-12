@@ -152,9 +152,10 @@ const response = await calendar.events.insert({
 });
 
     res.json({
-      success: true,
-      eventId: response.data.id,
-    });
+  success: true,
+  eventId: response.data.id,
+  bookedSlot: start.toISOString(),
+});
 
   } catch (error) {
     console.error(error);
