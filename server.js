@@ -1,20 +1,20 @@
+const express = require("express");
+
 const cors = require("cors");
-const cors = require("cors");
+const generateSlots = require("./services/availability");
+const calendar = require("./services/calendar");
+const app = express();
 
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "http://localhost:5173",
-    "https://your-frontend-domain.com"
+    "http://localhost:5173"
   ],
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ["GET", "POST"],
   credentials: true
 }));
-const generateSlots = require("./services/availability");
-const express = require("express");
-const calendar = require("./services/calendar");
+app.options("*", cors());
 // const openai = require("./services/openai");
-const app = express();
 app.use(express.json());
 app.get("/", (req,res)=>{
    res.send("Server Running");
