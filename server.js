@@ -10,15 +10,9 @@ app.use(cors({
     "http://localhost:3000",
     "http://localhost:5173"
   ],
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "OPTIONS"],
   credentials: true
 }));
-app.options("*", cors());
-// const openai = require("./services/openai");
-app.use(express.json());
-app.get("/", (req,res)=>{
-   res.send("Server Running");
-});
 app.get("/events", async (req, res) => {
   try {
     const result = await calendar.events.list({
