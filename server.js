@@ -90,6 +90,7 @@ app.post("/book-meeting", async (req, res) => {
   try {
 
    const { name, email, service, slot } = req.body;
+    console.log("CALENDAR ID:", process.env.GOOGLE_CALENDAR_ID);
 
 const start = new Date(slot);
 
@@ -146,10 +147,14 @@ if (conflict) {
     message: "This slot has already been booked. Please choose another time.",
   });
 }
+console.log("BOOKING EVENT:", event);
+
 const response = await calendar.events.insert({
   calendarId: process.env.GOOGLE_CALENDAR_ID,
   resource: event,
 });
+
+console.log("GOOGLE RESPONSE:", response.data);
 
     res.json({
   success: true,
