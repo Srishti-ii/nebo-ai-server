@@ -1,10 +1,9 @@
 
 const express = require("express");
-
-const cors = require("cors");
 const generateSlots = require("./services/availability");
 const calendar = require("./services/calendar");
 const app = express();
+const cors = require("cors");
 
 app.use(cors({
   origin: [
