@@ -71,7 +71,7 @@ app.get("/create-test-meeting", async (req, res) => {
   calendarId: process.env.GOOGLE_CALENDAR_ID,
   resource: event,
   conferenceDataVersion: 1,
-  sendUpdates: "all",
+
 });
 
    console.log(JSON.stringify(response.data, null, 2));
@@ -106,11 +106,6 @@ Email: ${email}
 Service: ${service}
   `,
 
-  attendees: [
-    {
-      email: email
-    }
-  ],
 
   start: {
     dateTime: start.toISOString(),
@@ -166,7 +161,7 @@ const response = await calendar.events.insert({
   calendarId: process.env.GOOGLE_CALENDAR_ID,
   resource: event,
   conferenceDataVersion: 1,
-  sendUpdates: "all",
+  
 });
 
 console.log("GOOGLE RESPONSE:", response.data);
