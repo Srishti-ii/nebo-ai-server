@@ -13,6 +13,15 @@ app.use(cors({
   methods: ["GET", "POST", "OPTIONS"],
   credentials: true
 }));
+app.use(express.json());
+app.post("/test-body", (req, res) => {
+  console.log("TEST BODY:", req.body);
+
+  res.json({
+    success: true,
+    body: req.body
+  });
+});
 app.get("/events", async (req, res) => {
   try {
     const result = await calendar.events.list({
