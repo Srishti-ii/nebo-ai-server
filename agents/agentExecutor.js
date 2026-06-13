@@ -15,17 +15,9 @@ async function agentExecutor(
   session,
   userMessage
 ) {
-  const plan =
-    await planner(
-      session,
-      userMessage
-    );
-    console.log(
-  "PLANNER OUTPUT:",
-  plan
-);
-const leadData =
+  const leadData =
 await leadExtractor(
+  session,
   userMessage
 );
 
@@ -57,11 +49,24 @@ leadData
  session.lead[key] =
  value;
 });
-  console.log(
-    "PLAN:",
-    plan
-  );
-
+console.log(
+  "CURRENT LEAD:",
+  JSON.stringify(
+    session.lead,
+    null,
+    2
+  )
+);
+ 
+const plan =
+    await planner(
+      session,
+      userMessage
+    );
+    console.log(
+  "PLANNER OUTPUT:",
+  plan
+);
 
   if (
     session.state ===

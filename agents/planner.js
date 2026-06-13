@@ -80,7 +80,66 @@ Rules:
 
 Return ONLY valid JSON.
 `;
+// BUSINESS KNOWN
+// BUDGET MISSING
 
+if (
+  lead.industry &&
+  !lead.budget
+) {
+  return {
+    action:
+      "discover_budget"
+  };
+}
+
+// INDUSTRY + BUDGET KNOWN
+// TIMELINE MISSING
+
+if (
+  lead.industry &&
+  lead.budget &&
+  !lead.timeline
+) {
+  return {
+    action:
+      "discover_timeline"
+  };
+}
+
+// EVERYTHING KNOWN
+
+if (
+  lead.industry &&
+  lead.budget &&
+  lead.timeline
+) {
+  return {
+    action:
+      "offer_consultation"
+  };
+}
+if (
+  session.state ===
+  "OFFER_CONSULTATION"
+) {
+
+  const msg =
+    message.toLowerCase();
+
+  if (
+    msg.includes("yes") ||
+    msg.includes("sure") ||
+    msg.includes("okay") ||
+    msg.includes("book") ||
+    msg.includes("schedule")
+  ) {
+    return {
+      action:
+        "show_slots"
+    };
+  }
+}
   const result =
     await callGemini(prompt);
 console.log(

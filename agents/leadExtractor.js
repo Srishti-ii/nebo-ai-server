@@ -2,34 +2,66 @@ const callGemini =
   require("../services/gemini");
 
 async function leadExtractor(
+  session,
   message
 ) {
-  const prompt = `
-Extract lead information.
 
-User:
+  const prompt = `
+You are a lead extraction engine.
+
+Current Lead:
+
+${JSON.stringify(
+  session.lead,
+  null,
+  2
+)}
+
+User Message:
+
 ${message}
 
-Return JSON only.
+Extract any NEW information.
+
+Return ONLY JSON.
 
 {
- "company":null,
- "industry":null,
- "employees":null,
- "budget":null,
- "timeline":null,
- "goal":null,
- "painPoint":null,
- "service":null
+  "company": null,
+  "industry": null,
+  "employees": null,
+  "budget": null,
+  "timeline": null,
+  "goal": null,
+  "painPoint": null,
+  "service": null
 }
 `;
 
   const result =
     await callGemini(prompt);
 
+  console.log(
+    "RAW LEAD:",
+    result
+  );
+
   try {
-    return JSON.parse(result);
-  } catch {
+
+    const cleaned =
+      result
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+    return JSON.parse(cleaned);
+
+  } catch (err) {
+
+    console.log(
+      "LEAD PARSE ERROR:",
+      err
+    );
+
     return {};
   }
 }
