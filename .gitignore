@@ -3,3 +3,5 @@ node_modules
 .env
 credentials.json
 .DS_Storecredentials.json
+config/oauth.json
+token.json
