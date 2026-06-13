@@ -330,6 +330,12 @@ console.log("Generated slots:", formattedSlots);
     res.status(500).send(error.message);
   }
 });
+app.get("/version", (req, res) => {
+  res.json({
+    version: "chat-route-v1",
+    chatRouteExists: true
+  });
+});
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
