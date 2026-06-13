@@ -1,4 +1,3 @@
-const { createCalendarEvent } = require("../services/calendarService");
 const { sendBookingEmail } = require("../services/email");
 
 async function createBooking(req, res) {

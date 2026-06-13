@@ -1,5 +1,6 @@
 require("dotenv").config();
-
+const agentRoutes =
+require("./routes/agentRoutes");
 const {
   sendBookingEmail
 } = require("./services/email");
@@ -17,7 +18,8 @@ console.log(
   "RESEND KEY EXISTS:",
   !!process.env.RESEND_API_KEY
 );
-
+app.use(express.json());
+app.use("/api", agentRoutes);
 app.use(cors({
   origin: [
     "http://localhost:3000",
@@ -27,7 +29,6 @@ app.use(cors({
   methods: ["GET", "POST", "OPTIONS"],
   credentials: true
 }));
-app.use(express.json());
 app.use("/api", bookingRoutes);
 
 app.get("/", (req, res) => {
@@ -43,6 +44,40 @@ app.post("/test-body", (req, res) => {
     success: true,
     body: req.body
   });
+});
+app.get("/test-gemini", async (req, res) => {
+  try {
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": process.env.GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: "Say hello"
+                }
+              ]
+            }
+          ]
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    res.status(response.status).json(data);
+
+  } catch (err) {
+    res.status(500).json({
+      error: err.message
+    });
+  }
 });
 app.get("/events", async (req, res) => {
   try {
@@ -330,53 +365,8 @@ console.log("Generated slots:", formattedSlots);
     res.status(500).send(error.message);
   }
 });
-app.get("/version", (req, res) => {
-  res.json({
-    version: "chat-route-v1",
-    chatRouteExists: true
-  });
-});
-app.post("/chat", async (req, res) => {
-  try {
-    const { message } = req.body;
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key":
-            process.env.GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: message,
-                },
-              ],
-            },
-          ],
-        }),
-      }
-    );
 
-    const data = await response.json();
-
-    res.json(data);
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
 const PORT = process.env.PORT;
 
 app.listen(PORT, "0.0.0.0", () => {
