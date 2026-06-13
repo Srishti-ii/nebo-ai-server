@@ -1,30 +1,21 @@
 const tools =
-require("./toolRegistry");
+  require("./toolRegistry");
 
-async function routeTool(
-  action,
-  args
+async function runTool(
+  toolName,
+  payload
 ) {
+  const tool =
+    tools[toolName];
 
-  switch(action) {
-
-    case "getAvailableSlots":
-      return await tools
-        .getAvailableSlots();
-
-    case "bookConsultation":
-      return await tools
-        .bookConsultation(args);
-
-    case "sendFollowupEmail":
-      return await tools
-        .sendFollowupEmail(args);
-
-    default:
-      return null;
+  if (!tool) {
+    throw new Error(
+      `Tool not found: ${toolName}`
+    );
   }
+
+  return await tool(payload);
 }
 
-module.exports = {
-  routeTool
-};
+module.exports =
+  runTool;

@@ -1,128 +1,66 @@
-const {
-  callGemini
-} = require(
-  "../services/gemini"
-);
 
 const {
-  SYSTEM_PROMPT
-} = require(
-  "../agents/salesAgent"
-);
-
-const {
-  getConversation,
-  saveConversation
-} = require(
-  "../memory/conversationMemory"
-);
-
+  getSession,
+  saveSession
+} = require("../memory/conversationMemory");
+const executeAgent =
+  require(
+    "../agents/agentExecutor"
+  );
 exports.chatWithAgent =
   async (req, res) => {
-    console.log(
-  "REQ BODY:",
-  req.body
-);
     try {
       const {
         sessionId,
         message
-      } = req.body || {};
-if (
-      !sessionId ||
-      !message
-    ) {
-      return res.status(400).json({
-        success: false,
-        error:
-          "sessionId and message are required"
-      });
-    }
-      const conversation =
-        getConversation(
+      } = req.body;
+
+      const session =
+        getSession(
           sessionId
         );
 
-      conversation.history.push({
+      session.history.push({
         role: "user",
-        text: message
+
+        parts: [
+          {
+            text: message
+          }
+        ]
       });
 
-      const prompt = [
-        {
-          role: "user",
+      const result =
+  await executeAgent(
+    session,
+    message
+  );
+  saveSession(
+  sessionId,
+  session
+);
+
+      if (
+        result.type ===
+        "text"
+      ) {
+        session.history.push({
+          role: "model",
+
           parts: [
             {
               text:
-                SYSTEM_PROMPT +
-                "\n\nConversation:\n" +
-                JSON.stringify(
-                  conversation.history
-                ) +
-                "\n\nUser: " +
-                message
+                result.response
             }
           ]
-        }
-      ];
+        });
+      }
 
-      const result =
-        await callGemini(
-          prompt
-        );
-
-      const reply =
-        result.candidates?.[0]
-          ?.content?.parts?.[0]
-          ?.text ||
-        "Sorry, I couldn't process that.";
-const tools =
-require("../agents/toolRegistry");
-if (
-  reply.trim() ===
-  "GET_AVAILABLE_SLOTS"
-) {
-
-  const slots =
-    await tools
-      .getAvailableSlots();
-
-  return res.json({
-    success: true,
-
-    action:
-      "show_slots",
-
-    slots,
-  });
-}if (
-  reply.trim() ===
-  "BOOK_CONSULTATION"
-) {
-
-  return res.json({
-    success: true,
-
-    action:
-      "collect_booking_details",
-  });
-}
-      conversation.history.push({
-        role: "assistant",
-        text: reply
-      });
-
-      saveConversation(
-        sessionId,
-        conversation
-      );
-
-      res.json({
-        success: true,
-        reply
-      });
+      res.json(result);
     } catch (error) {
-      console.error(error);
+      console.error(
+        error
+      );
 
       res.status(500).json({
         success: false,

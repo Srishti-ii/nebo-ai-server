@@ -45,40 +45,8 @@ app.post("/test-body", (req, res) => {
     body: req.body
   });
 });
-app.get("/test-gemini", async (req, res) => {
-  try {
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: "Say hello"
-                }
-              ]
-            }
-          ]
-        })
-      }
-    );
 
-    const data = await response.json();
-
-    res.status(response.status).json(data);
-
-  } catch (err) {
-    res.status(500).json({
-      error: err.message
-    });
-  }
-});
+   
 app.get("/events", async (req, res) => {
   try {
     const result = await calendar.events.list({

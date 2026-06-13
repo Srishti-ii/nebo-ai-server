@@ -1,41 +1,42 @@
 const memory = new Map();
 
-function getConversation(sessionId) {
-  return (
-    memory.get(sessionId) || {
-  history: [],
+function getSession(sessionId) {
+  if (!memory.has(sessionId)) {
+    memory.set(sessionId, {
+      history: [],
+      state: "DISCOVERY",
+      facts: {},
+      lead: {
+  company: null,
+  industry: null,
+  employees: null,
+  budget: null,
+  timeline: null,
+  painPoint: null,
+},
+      booking: {
+        name: null,
+        email: null,
+        slot: null,
+      },
+      lastTool: null,
+    });
+  }
 
-  facts: {},
-
-  lead: {
-    company: null,
-    industry: null,
-    budget: null,
-    timeline: null
-  },
-
-  booking: {
-    name: null,
-    email: null,
-    slot: null
-  },
-
-  lastTool: null
+  return memory.get(sessionId);
 }
-  );
-}
 
-function saveConversation(
+function saveSession(
   sessionId,
-  conversation
+  session
 ) {
   memory.set(
     sessionId,
-    conversation
+    session
   );
 }
 
 module.exports = {
-  getConversation,
-  saveConversation
+  getSession,
+  saveSession,
 };
