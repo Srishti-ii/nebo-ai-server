@@ -1,9 +1,6 @@
 const { google } =
 require("googleapis");
 
-const { google } =
-require("googleapis");
-
 const auth =
 new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
