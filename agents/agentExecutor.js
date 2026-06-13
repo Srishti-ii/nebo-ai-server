@@ -1,7 +1,9 @@
+const leadExtractor =
+require("./leadExtractor");
 const planner = require("./planner");
 
-const runTool =
-  require("./toolRouter");
+const runTools =
+require("./toolRouter");
 
 const salesAgent =
   require("./salesAgent");
@@ -18,7 +20,43 @@ async function agentExecutor(
       session,
       userMessage
     );
+    console.log(
+  "PLANNER OUTPUT:",
+  plan
+);
+const leadData =
+await leadExtractor(
+  userMessage
+);
 
+Object.entries(
+leadData
+).forEach(
+([key, value]) => {
+
+ if (
+   value === null ||
+   value === undefined
+ ) {
+   return;
+ }
+
+ if (
+   Array.isArray(value)
+ ) {
+
+   session.lead[key] =
+   [
+     ...(session.lead[key] || []),
+     ...value,
+   ];
+
+   return;
+ }
+
+ session.lead[key] =
+ value;
+});
   console.log(
     "PLAN:",
     plan
@@ -70,27 +108,30 @@ console.log(
       session.state ===
       "COLLECT_EMAIL"
     ) {
-      const bookingResult =
-        await runTool(
-          "bookMeeting",
-          {
-            name:
-              session.booking
-                .name ||
-              "Website Visitor",
+     const results =
+await runTools([
+  {
+    name: "bookMeeting",
 
-            email:
-              session.booking
-                .email,
+    payload: {
+      name:
+        session.booking.name ||
+        "Website Visitor",
 
-            service:
-              "AI Consultation",
+      email:
+        session.booking.email,
 
-            slot:
-              session.booking
-                .slot,
-          }
-        );
+      service:
+        "AI Consultation",
+
+      slot:
+        session.booking.slot,
+    },
+  },
+]);
+
+const bookingResult =
+results[0].result;
 
       session.state =
         "COMPLETED";
@@ -123,10 +164,14 @@ ${session.booking.email}
     plan.action ===
     "show_slots"
   ) {
-    const slots =
-      await runTool(
-        "getAvailableSlots"
-      );
+    const results = await runTools([
+  {
+    name: "getAvailableSlots"
+  }
+]);
+
+const slots =
+  results[0].result;
 
     session.state =
       "SHOW_SLOTS";
@@ -144,9 +189,9 @@ ${session.booking.email}
 
 
   if (
-    plan.action ===
-    "possible_booking"
-  ) {
+  plan.action ===
+  "offer_consultation"
+) {
     session.state =
       "OFFER_CONSULTATION";
 
@@ -159,7 +204,60 @@ ${session.booking.email}
   }
 
   
+if (
+  plan.action ===
+  "discover_business"
+) {
+  return {
+    type: "text",
 
+    response:
+      "I'd love to learn more about your business. What does your company do?",
+  };
+}
+
+if (
+  plan.action ===
+  "discover_timeline"
+) {
+  return {
+    type: "text",
+
+    response:
+      "What timeline are you aiming for to launch this project?",
+  };
+}
+if (
+  plan.action ===
+  "answer_knowledge"
+) {
+
+  const knowledgeAgent =
+    require("./knowledgeAgent");
+
+  const answer =
+    knowledgeAgent(
+      userMessage
+    );
+
+  if (answer) {
+    return {
+      type: "text",
+      response: answer,
+    };
+  }
+}
+if (
+  plan.action ===
+  "discover_budget"
+) {
+  return {
+    type: "text",
+
+    response:
+      "Do you have a rough budget range in mind for this project?",
+  };
+}
   const response =
     await salesAgent(
       session,

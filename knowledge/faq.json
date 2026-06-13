@@ -1,0 +1,15 @@
+[
+  {
+    "question":
+      "Do you build websites?",
+    "answer":
+      "Yes. Nebo builds business websites and web applications."
+  },
+
+  {
+    "question":
+      "Do you build AI chatbots?",
+    "answer":
+      "Yes. We create custom AI chatbot solutions."
+  }
+]

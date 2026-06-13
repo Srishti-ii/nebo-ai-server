@@ -6,13 +6,17 @@ function getSession(sessionId) {
       history: [],
       state: "DISCOVERY",
       facts: {},
-      lead: {
-  company: null,
-  industry: null,
-  employees: null,
-  budget: null,
-  timeline: null,
-  painPoint: null,
+     lead: {
+ company:null,
+ industry:null,
+ employees:null,
+ budget:null,
+ timeline:null,
+ goals:[],
+ painPoints:[],
+ servicesInterested:[],
+ consultationOffered:false,
+ consultationAccepted:false
 },
       booking: {
         name: null,

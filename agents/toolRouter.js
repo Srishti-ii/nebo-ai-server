@@ -1,21 +1,35 @@
 const tools =
-  require("./toolRegistry");
+require("./toolRegistry");
 
-async function runTool(
-  toolName,
-  payload
+async function runTools(
+toolCalls
 ) {
-  const tool =
-    tools[toolName];
+  const results = [];
 
-  if (!tool) {
-    throw new Error(
-      `Tool not found: ${toolName}`
-    );
+  for (
+    const call of toolCalls
+  ) {
+    const tool =
+      tools[call.name];
+
+    if (!tool)
+      continue;
+
+    const result =
+      await tool(
+        call.payload
+      );
+
+    results.push({
+      tool:
+        call.name,
+
+      result,
+    });
   }
 
-  return await tool(payload);
+  return results;
 }
 
 module.exports =
-  runTool;
+runTools;

@@ -1,0 +1,16 @@
+{
+  "chatbot": {
+    "title": "AI Chatbots",
+    "description": "Custom AI chatbots for lead generation, support and automation."
+  },
+
+  "website": {
+    "title": "Website Development",
+    "description": "Business websites optimized for conversion."
+  },
+
+  "crm": {
+    "title": "CRM Automation",
+    "description": "CRM implementation and automation."
+  }
+}
