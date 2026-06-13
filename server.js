@@ -330,48 +330,47 @@ console.log("Generated slots:", formattedSlots);
     res.status(500).send(error.message);
   }
 });
-// app.post("/chat", async (req, res) => {
-//   try {
-//     const { message } = req.body;
+app.post("/chat", async (req, res) => {
+  try {
+    const { message } = req.body;
 
-//     const completion = await openai.chat.completions.create({
-//       model: "gpt-4o-mini",
-//       messages: [
-//         {
-//           role: "system",
-//           content: `
-// You are Nebo IT Solutions AI assistant.
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key":
+            process.env.GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: message,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
-// Services:
-// - AI Automation
-// - Website Development
-// - Mobile Apps
-// - CRM Solutions
+    const data = await response.json();
 
-// If user wants a meeting,
-// tell them you can help schedule one.
-// `
-//         },
-//         {
-//           role: "user",
-//           content: message
-//         }
-//       ]
-//     });
+    res.json(data);
 
-//     res.json({
-//       reply: completion.choices[0].message.content
-//     });
+  } catch (error) {
 
-//   } catch (error) {
-//     console.error(error);
+    console.error(error);
 
-//     res.status(500).json({
-//       success: false,
-//       error: error.message
-//     });
-//   }
-// });
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
 const PORT = process.env.PORT;
 
 app.listen(PORT, "0.0.0.0", () => {
