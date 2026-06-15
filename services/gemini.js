@@ -1,69 +1,37 @@
+const {
+  GoogleGenerativeAI
+} = require("@google/generative-ai");
+
+
+const genAI =
+  new GoogleGenerativeAI(
+    process.env.GEMINI_API_KEY
+  );
+
+
+const model =
+  genAI.getGenerativeModel({
+    model:
+      "gemini-2.5-flash"
+  });
+
+
 async function callGemini(prompt) {
 
-  const apiKey =
-    process.env.GEMINI_API_KEY;
-
-
-  if (!apiKey) {
-    throw new Error(
-      "GEMINI_API_KEY missing"
+  const result =
+    await model.generateContent(
+      prompt
     );
-  }
 
 
   const response =
-    await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:JSON.stringify({
-
-          contents:[
-            {
-              parts:[
-                {
-                  text:prompt
-                }
-              ]
-            }
-          ]
-
-        })
-
-      }
-    );
+    result.response;
 
 
-  const data =
-    await response.json();
-
-
-  if(!response.ok){
-
-    throw new Error(
-      data?.error?.message ||
-      "Gemini request failed"
-    );
-
-  }
-
-
-  return (
-    data
-    ?.candidates?.[0]
-    ?.content
-    ?.parts?.[0]
-    ?.text || ""
-  );
+  return response.text();
 
 }
 
 
 module.exports =
-callGemini;
+  callGemini;
