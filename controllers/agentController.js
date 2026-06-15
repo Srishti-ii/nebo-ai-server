@@ -19,6 +19,9 @@ await memory.getMessages(
 );
 const session = {
 
+id:
+sessionId,
+
 history:
 history.map(msg => ({
   role:
