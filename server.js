@@ -1,3 +1,4 @@
+require("./config/env");
 require("dotenv").config();
 const runMigration =
 require("./database/runMigration");

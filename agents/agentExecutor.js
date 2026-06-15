@@ -42,7 +42,24 @@ async function agentExecutor(
   if (!session.lead) {
     session.lead = {};
   }
+const existingLead =
+await leadService.getLeadBySession(
+ session.sessionId
+);
 
+
+if(existingLead){
+
+session.lead = {
+
+...existingLead,
+
+painPoint:
+existingLead.pain_points
+
+};
+
+}
 
   if (!session.booking) {
     session.booking = {};
@@ -174,27 +191,22 @@ async function agentExecutor(
 
 
 
-  // Save final lead state
-
-  await saveLead({
-
-    sessionId:
-      session.id,
-
-    lead:
-      session.lead
-
-  });
-
-
-
-
-
   const plan =
     await planner(
       session,
       userMessage
     );
+
+
+  await saveLead({
+
+    sessionId:
+    session.sessionId,
+
+    lead:
+      session.lead
+
+  });
 
 
 
@@ -342,7 +354,7 @@ ${JSON.stringify(
         await saveLead({
 
           sessionId:
-            session.id,
+          session.sessionId,
 
           lead:
             session.lead
@@ -351,16 +363,13 @@ ${JSON.stringify(
 
 
 
-
-      // Booking database save protection
-
       try {
 
 
         await saveBooking({
 
           sessionId:
-            session.id,
+            session.sessionId,
 
 
           leadId:

@@ -8,16 +8,24 @@ require("../routes/agentRoutes");
 
 const bookingRoutes =
 require("../routes/bookingRoutes");
-
+const helmet =
+require("helmet");
 
 const app = express();
+const morgan =
+require("morgan");
 
+app.use(
+ morgan("combined")
+);
 
 app.use(
  express.json()
 );
 
-
+app.use(
+ helmet()
+);
 app.use(
  cors({
   origin:[
@@ -54,7 +62,18 @@ app.get(
   });
  }
 );
+app.get(
+"/health",
+(req,res)=>{
 
+res.json({
+status:"ok"
+});
 
+});
 
+const errorHandler =
+require("../middleware/errorHandler");
+
+app.use(errorHandler);
 module.exports = app;
