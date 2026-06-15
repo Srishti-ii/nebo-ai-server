@@ -15,9 +15,29 @@ const salesAgent =
 const isSlotSelected =
   require("../tools/isSlotSelected");
 
-if (
-  session.lead.score >= 60
+
+async function agentExecutor(
+  session,
+  userMessage
 ) {
+
+
+  if (!session.lead) {
+    session.lead = {};
+  }
+
+  if (!session.booking) {
+    session.booking = {};
+  }
+
+  if (!session.followups) {
+    session.followups = {};
+  }
+
+
+  if (
+    (session.lead.score || 0) >= 60
+  ) {
   session.lead.status =
     "hot";
 }
@@ -31,11 +51,6 @@ else {
   session.lead.status =
     "cold";
 }
-
-async function agentExecutor(
-  session,
-  userMessage
-) {
   const leadData =
 await leadExtractor(
   session,
