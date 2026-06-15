@@ -1,5 +1,5 @@
 const { resend } =
-require("../src/services/email");
+require("../services/email");
 
 async function sendFollowupEmail({
   email,
