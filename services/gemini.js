@@ -1,50 +1,69 @@
-async function callGemini(
-  prompt
-) {
+async function callGemini(prompt) {
+
+  const apiKey =
+    process.env.GEMINI_API_KEY;
+
+
+  if (!apiKey) {
+    throw new Error(
+      "GEMINI_API_KEY missing"
+    );
+  }
+
+
   const response =
     await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
-        method: "POST",
+        method:"POST",
 
-        headers: {
+        headers:{
           "Content-Type":
-            "application/json",
-
-          "x-goog-api-key":
-            process.env.GEMINI_API_KEY,
+            "application/json"
         },
 
-        body: JSON.stringify({
-          contents: [
+        body:JSON.stringify({
+
+          contents:[
             {
-              parts: [
+              parts:[
                 {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-        }),
+                  text:prompt
+                }
+              ]
+            }
+          ]
+
+        })
+
       }
     );
+
 
   const data =
     await response.json();
 
-  if (!response.ok) {
+
+  if(!response.ok){
+
     throw new Error(
       data?.error?.message ||
-        "Gemini Error"
+      "Gemini request failed"
     );
+
   }
 
+
   return (
-    data.candidates?.[0]
-      ?.content?.parts?.[0]
-      ?.text || ""
+    data
+    ?.candidates?.[0]
+    ?.content
+    ?.parts?.[0]
+    ?.text || ""
   );
+
 }
 
+
 module.exports =
-  callGemini;
+callGemini;
