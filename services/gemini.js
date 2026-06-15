@@ -16,70 +16,65 @@ genAI.getGenerativeModel({
 
 
 function sleep(ms) {
-
   return new Promise(
-    resolve =>
-      setTimeout(resolve, ms)
+    resolve => setTimeout(resolve, ms)
   );
-
 }
-
 
 
 async function callGemini(prompt) {
 
+  let lastError;
+
 
   for (
-    let attempt = 1;
-    attempt <= 3;
+    let attempt = 0;
+    attempt < 4;
     attempt++
   ) {
 
-
     try {
-
 
       const result =
         await model.generateContent(
           prompt
         );
 
-
       return result.response.text();
 
 
     } catch(error) {
 
-
-      console.error(
-        `Gemini attempt ${attempt} failed:`,
-        error.message
-      );
+      lastError = error;
 
 
-      if (
-        error.message.includes("503") &&
-        attempt < 3
-      ) {
+      const isTemporary =
+        error.message.includes("503") ||
+        error.message.includes("429");
 
 
-        await sleep(
-          attempt * 3000
-        );
-
-
-        continue;
-
+      if (!isTemporary) {
+        throw error;
       }
 
 
-      throw error;
+      const delay =
+        Math.pow(2, attempt) * 2000;
 
+
+      console.log(
+        `Gemini retry in ${delay}ms`
+      );
+
+
+      await sleep(delay);
     }
-
   }
 
+
+  throw lastError;
 }
+
 
 
 
