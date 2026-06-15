@@ -11,9 +11,11 @@ await db.query(
 `
 INSERT INTO conversations(session_id)
 VALUES($1)
+
 ON CONFLICT(session_id)
 DO UPDATE SET
 updated_at = NOW()
+
 RETURNING *
 `,
 [
@@ -74,10 +76,14 @@ await db.query(
 SELECT
 m.role,
 m.content
+
 FROM messages m
+
 JOIN conversations c
 ON m.conversation_id=c.id
+
 WHERE c.session_id=$1
+
 ORDER BY m.created_at ASC
 `,
 [
