@@ -1,6 +1,25 @@
 const db =
 require("../config/database");
+async function getLeadBySession(
+ sessionId
+){
 
+const result =
+await db.query(
+`
+SELECT *
+FROM leads
+WHERE session_id=$1
+`,
+[
+sessionId
+]
+);
+
+
+return result.rows[0];
+
+}
 
 async function saveLead(
 {
@@ -68,7 +87,9 @@ return result.rows[0];
 }
 
 
-module.exports =
-{
- saveLead
+module.exports = {
+
+saveLead,
+getLeadBySession
+
 };

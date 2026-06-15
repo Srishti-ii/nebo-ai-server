@@ -17,6 +17,16 @@ exports.chatWithAgent =
 await memory.getMessages(
   sessionId
 );
+const leadRepository =
+require("../database/leadRepository");
+
+
+const existingLead =
+await leadRepository.getLeadBySession(
+  sessionId
+);
+
+
 const session = {
 
 history:
@@ -35,12 +45,10 @@ history.map(msg => ({
 
 
 lead:
-{
-},
+existingLead || {},
 
-booking:
-{
-}
+
+booking:{}
 
 };
       await memory.saveMessage({

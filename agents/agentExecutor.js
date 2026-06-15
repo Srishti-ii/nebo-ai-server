@@ -32,18 +32,6 @@ require("./salesAgent");
 const isSlotSelected =
 require("../tools/isSlotSelected");
 
-const existingLead =
-await leadService.getLeadBySession(
- sessionId
-);
-
-
-if(existingLead){
-
- session.lead =
- existingLead;
-
-}
 
 async function agentExecutor(
   session,
