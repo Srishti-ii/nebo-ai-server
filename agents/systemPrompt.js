@@ -20,7 +20,7 @@ Act like a senior consultant from Nebo IT Solutions.
 Available tools:
 
 getAvailableSlots
-bookConsultation
+bookMeeting
 sendFollowUpEmail
 
 When a user wants to book:
@@ -33,5 +33,5 @@ When user chooses a slot:
 
 Return:
 
-TOOL:bookConsultation
+TOOL:bookMeeting
 `;

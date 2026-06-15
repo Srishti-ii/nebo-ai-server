@@ -1,35 +1,44 @@
-const tools =
+const toolRegistry =
 require("./toolRegistry");
 
-async function runTools(
-toolCalls
+async function runTool(
+toolName,
+params = {}
 ) {
-  const results = [];
 
-  for (
-    const call of toolCalls
-  ) {
-    const tool =
-      tools[call.name];
+  const tool =
+    toolRegistry[toolName];
 
-    if (!tool)
-      continue;
+  if (!tool) {
 
-    const result =
-      await tool(
-        call.payload
+    throw new Error(
+      `Unknown tool: ${toolName}`
+    );
+  }
+
+  return await tool(params);
+}
+
+async function runTools(
+toolNames,
+params = {}
+) {
+
+  const results = {};
+
+  for (const toolName of toolNames) {
+
+    results[toolName] =
+      await runTool(
+        toolName,
+        params
       );
-
-    results.push({
-      tool:
-        call.name,
-
-      result,
-    });
   }
 
   return results;
 }
 
-module.exports =
-runTools;
+module.exports = {
+  runTool,
+  runTools,
+};

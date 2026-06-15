@@ -1,8 +1,6 @@
 
-const {
-  getSession,
-  saveSession
-} = require("../memory/conversationMemory");
+const memory =
+require("../memory/memoryService");
 const executeAgent =
   require(
     "../agents/agentExecutor"
@@ -15,20 +13,40 @@ exports.chatWithAgent =
         message
       } = req.body;
 
-      const session =
-        getSession(
-          sessionId
-        );
+    let history =
+await memory.getMessages(
+  sessionId
+);
+const session = {
 
-      session.history.push({
-        role: "user",
+history:
+history.map(msg => ({
+  role:
+    msg.role === "assistant"
+      ? "model"
+      : msg.role,
 
-        parts: [
-          {
-            text: message
-          }
-        ]
-      });
+  parts:[
+    {
+      text:msg.content
+    }
+  ]
+})),
+
+lead:{},
+
+booking:{}
+
+};
+      await memory.saveMessage({
+
+sessionId,
+
+role:"user",
+
+content:message
+
+});
 
       const result =
   await executeAgent(
@@ -55,7 +73,16 @@ exports.chatWithAgent =
           ]
         });
       }
+await memory.saveMessage({
 
+sessionId,
+
+role:"assistant",
+
+content:
+result.response
+
+});
       res.json(result);
     } catch (error) {
       console.error(

@@ -1,38 +1,37 @@
-const { sendBookingEmail } = require("../services/email");
+const bookMeeting =
+require("./services/bookingService");
 
-async function createBooking(req, res) {
-  try {
-    const { name, email, date, time } = req.body;
 
-    const startTime = new Date(`${date} ${time}`);
-    const endTime = new Date(startTime.getTime() + 30 * 60000);
+async function createBooking(
+ req,
+ res
+){
 
-    // 1. Create Google Meet event
-    const { meetLink } = await createCalendarEvent({
-      name,
-      email,
-      startTime,
-      endTime,
-    });
+try{
 
-    // 2. Send email
-    await sendBookingEmail({
-      to: email,
-      name,
-      date,
-      time,
-      meetLink,
-    });
+const result =
+await bookMeeting(
+ req.body
+);
 
-    return res.json({
-      success: true,
-      meetLink,
-    });
 
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Booking failed" });
-  }
+res.json(result);
+
+
+}catch(error){
+
+res
+.status(error.statusCode || 500)
+.json({
+ success:false,
+ error:error.message
+});
+
 }
 
-module.exports = { createBooking };
+}
+
+
+module.exports={
+ createBooking
+}

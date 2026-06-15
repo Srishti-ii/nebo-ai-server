@@ -1,15 +1,36 @@
 const leadExtractor =
 require("./leadExtractor");
-const planner = require("./planner");
+const leadScorer =
+require("./leadScorer");
 
-const runTools =
-require("./toolRouter");
+const planner = require("./planner");
+const {
+  runTool,
+  runTools,
+} = require("./toolRouter");
 
 const salesAgent =
   require("./salesAgent");
 
 const isSlotSelected =
   require("../tools/isSlotSelected");
+
+if (
+  session.lead.score >= 60
+) {
+  session.lead.status =
+    "hot";
+}
+else if (
+  session.lead.score >= 30
+) {
+  session.lead.status =
+    "warm";
+}
+else {
+  session.lead.status =
+    "cold";
+}
 
 async function agentExecutor(
   session,
@@ -89,12 +110,47 @@ const plan =
     };
   }
 
-  
+  if (
+  plan.action ===
+  "tool_call"
+) {
+
+  const results =
+    await runTools(
+      plan.tools,
+      {
+        session,
+        userMessage,
+      }
+    );
+
+  const response =
+    await salesAgent(
+      session,
+      `
+User:
+${userMessage}
+
+Tool Results:
+${JSON.stringify(
+  results,
+  null,
+  2
+)}
+`
+    );
+
+  return {
+    type: "text",
+    response,
+  };
+}
 
   if (
     plan.action ===
     "capture_email"
-  ) {
+  ) 
+  {
     console.log(
   "CURRENT STATE:",
   session.state
@@ -106,7 +162,8 @@ console.log(
 );
     session.booking.email =
       plan.email;
-
+session.lead.email =
+  plan.email;
     
 
     if (

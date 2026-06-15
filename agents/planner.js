@@ -35,6 +35,16 @@ capture_email
 answer_knowledge
 consult
 
+If answering requires more than one tool:
+
+{
+  "action":"tool_call",
+  "tools":[
+    "knowledgeSearch",
+    "getAvailableSlots"
+  ]
+}
+  
 Rules:
 
 1. If the user mentions needing a chatbot, automation, CRM, AI solution, website, software, or business service AND business type is unknown:

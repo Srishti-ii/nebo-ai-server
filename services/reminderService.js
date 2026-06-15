@@ -1,3 +1,13 @@
+const sendFollowupEmail =
+require(
+  "../tools/sendFollowupEmail"
+);
+
+const {
+  getAllSessions,
+} = require(
+  "../memory/memoryService"
+);
 const {
   sendReminderEmail
 } = require("./email");
@@ -9,7 +19,95 @@ const cron = require("node-cron");
 cron.schedule("*/15 * * * *", async () => {
   try {
     console.log("Checking reminders...");
+const sessions =
+  getAllSessions();
 
+for (
+  const session of sessions
+) {
+
+  if (
+    !session.lead?.email
+  ) {
+    continue;
+  }
+
+  const age =
+    Date.now() -
+    session.createdAt;
+
+  const day1 =
+    24 * 60 * 60 * 1000;
+
+  const day3 =
+    3 * day1;
+
+  const day7 =
+    7 * day1;
+
+  if (
+    age >= day1 &&
+    !session.followups.day1
+  ) {
+
+    await sendFollowupEmail({
+      email:
+        session.lead.email,
+
+      name:
+        session.lead.company ||
+        "there",
+
+      stage:
+        "day1",
+    });
+
+    session.followups.day1 =
+      true;
+  }
+
+  if (
+    age >= day3 &&
+    !session.followups.day3
+  ) {
+
+    await sendFollowupEmail({
+      email:
+        session.lead.email,
+
+      name:
+        session.lead.company ||
+        "there",
+
+      stage:
+        "day3",
+    });
+
+    session.followups.day3 =
+      true;
+  }
+
+  if (
+    age >= day7 &&
+    !session.followups.day7
+  ) {
+
+    await sendFollowupEmail({
+      email:
+        session.lead.email,
+
+      name:
+        session.lead.company ||
+        "there",
+
+      stage:
+        "day7",
+    });
+
+    session.followups.day7 =
+      true;
+  }
+}
     const now = new Date();
 
     const upcomingEvents =
