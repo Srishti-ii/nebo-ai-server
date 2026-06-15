@@ -81,14 +81,26 @@ result.response
 });
       res.json(result);
     } catch (error) {
-      console.error(
-        error
-      );
 
-      res.status(500).json({
-        success: false,
-        error:
-          error.message
-      });
-    }
+  console.error(
+    "AGENT ERROR FULL:",
+    error
+  );
+
+  console.error(
+    "STACK:",
+    error.stack
+  );
+
+  res.status(500).json({
+
+    success:false,
+
+    error:
+      error.message ||
+      JSON.stringify(error)
+
+  });
+
+}
   };
