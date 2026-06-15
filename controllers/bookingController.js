@@ -1,5 +1,5 @@
 const bookMeeting =
-require("./services/bookingService");
+require("../services/bookingService");
 
 
 async function createBooking(

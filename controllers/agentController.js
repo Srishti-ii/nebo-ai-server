@@ -5,8 +5,6 @@ const executeAgent =
   require(
     "../agents/agentExecutor"
   );
-  const bookingService =
-require("../services/bookingService");
 exports.chatWithAgent =
   async (req, res) => {
     try {
