@@ -42,15 +42,14 @@ async function getAvailableSlots() {
         slot.toISOString(),
 
       label:
-        slot.toLocaleString(
-          "en-IN",
-          {
-            dateStyle:
-              "medium",
-            timeStyle:
-              "short",
-          }
-        ),
+slot.toLocaleString(
+"en-IN",
+{
+timeZone:"Asia/Kolkata",
+dateStyle:"medium",
+timeStyle:"short",
+}
+),
     }));
 }
 

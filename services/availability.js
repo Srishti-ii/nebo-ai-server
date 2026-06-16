@@ -1,55 +1,121 @@
 function generateSlots(events) {
-  const slots = [];
 
-  const today = new Date();
+const slots=[];
 
-  for (let day = 0; day < 7; day++) {
-    const currentDay = new Date(today);
-    currentDay.setDate(today.getDate() + day);
+const now = new Date();
 
-    // Skip Sunday
-    if (currentDay.getDay() === 0) continue;
+const indiaNow = new Date(
+ now.toLocaleString(
+  "en-US",
+  {
+   timeZone:"Asia/Kolkata"
+  }
+ )
+);
 
-    for (let hour = 10; hour < 18; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
 
-        const slotStart = new Date(currentDay);
-        slotStart.setHours(hour, minute, 0, 0);
+for(let day=0; day<7; day++){
 
-        const slotEnd = new Date(slotStart);
-        slotEnd.setMinutes(slotEnd.getMinutes() + 30);
+const currentDay =
+new Date(indiaNow);
 
-        const conflict = events.some(event => {
-          if (!event.start?.dateTime || !event.end?.dateTime) {
-            return false;
-          }
 
-          const eventStart = new Date(event.start.dateTime);
-          const eventEnd = new Date(event.end.dateTime);
+currentDay.setDate(
+ indiaNow.getDate()+day
+);
 
-          return (
-            slotStart < eventEnd &&
-            slotEnd > eventStart
-          );
-        });
 
-       const now = new Date();
+// skip sunday
+if(currentDay.getDay()===0)
+continue;
 
-now.setSeconds(0);
-now.setMilliseconds(0);
+
+
+for(
+let hour=10;
+hour<18;
+hour++
+){
+
+for(
+let minute=0;
+minute<60;
+minute+=30
+){
+
+
+const slotStart =
+new Date(
+ currentDay
+);
+
+
+slotStart.setHours(
+hour,
+minute,
+0,
+0
+);
+
 
 
 if(
-!conflict &&
-slotStart.getTime() > now.getTime()
-){
- slots.push(slotStart);
-}
-      }
-    }
-  }
+slotStart <= indiaNow
+)
+continue;
 
-  return slots.slice(0, 20);
+
+
+const slotEnd =
+new Date(slotStart);
+
+
+slotEnd.setMinutes(
+slotEnd.getMinutes()+30
+);
+
+
+
+const conflict =
+events.some(event=>{
+
+if(!event.start?.dateTime)
+return false;
+
+
+const start =
+new Date(
+event.start.dateTime
+);
+
+const end =
+new Date(
+event.end.dateTime
+);
+
+
+return (
+slotStart < end &&
+slotEnd > start
+);
+
+});
+
+
+
+if(!conflict)
+slots.push(slotStart);
+
 }
 
-module.exports = generateSlots;
+}
+
+}
+
+
+return slots.slice(0,10);
+
+}
+
+
+module.exports=generateSlots;
