@@ -195,8 +195,12 @@ existingLead.pain_points
 // HANDLE SLOT CLICK FIRST
 
 if (
-  session.state === "SHOW_SLOTS" &&
-  isSlotSelected(userMessage)
+ (
+ session.state === "SHOW_SLOTS" ||
+ session.state === "WAITING_FOR_SLOT"
+ )
+ &&
+ isSlotSelected(userMessage)
 ) {
 
   session.booking.slot =

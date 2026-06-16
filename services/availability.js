@@ -1,114 +1,106 @@
-function generateSlots(events = []) {
+function generateSlots(events=[]){
 
-  const slots = [];
-
-  const now =
-    new Date(
-      new Date().toLocaleString(
-        "en-US",
-        {
-          timeZone:"Asia/Kolkata"
-        }
-      )
-    );
+const slots=[];
 
 
-  const startDate =
-    new Date(now);
+const now = new Date();
 
 
-  // generate next 7 days
-  for(let day=0; day<7; day++){
+const startDate = new Date();
 
 
-    const date =
-      new Date(startDate);
-
-    date.setDate(
-      startDate.getDate()+day
-    );
-
-
-    // 10 AM IST
-    date.setHours(
-      10,
-      0,
-      0,
-      0
-    );
+startDate.setHours(
+10,
+0,
+0,
+0
+);
 
 
-    // 5 PM IST
-    const end =
-      new Date(date);
+for(let i=0;i<7;i++){
 
-    end.setHours(
-      17,
-      0,
-      0,
-      0
-    );
+const day =
+new Date(startDate);
 
 
-    while(date < end){
+day.setDate(
+startDate.getDate()+i
+);
 
 
-      // skip already passed slots
-      if(date > now){
+for(
+let hour=10;
+hour<=16;
+hour++
+){
+
+for(
+let minute of [0,30]
+){
 
 
-        const conflict =
-          events.some(event=>{
+const slot =
+new Date(day);
 
 
-            if(!event.start?.dateTime)
-              return false;
+slot.setHours(
+hour,
+minute,
+0,
+0
+);
 
 
-            const eventStart =
-              new Date(
-                event.start.dateTime
-              );
+// skip past time today
 
-
-            const eventEnd =
-              new Date(
-                event.end.dateTime
-              );
-
-
-            return (
-              date >= eventStart &&
-              date < eventEnd
-            );
-
-
-          });
+if(
+slot <= now
+)
+continue;
 
 
 
-        if(!conflict){
+const conflict =
+events.some(event=>{
 
-          slots.push(
-            new Date(date)
-          );
-
-        }
-
-      }
+if(!event.start.dateTime)
+return false;
 
 
-      // 30 minute slots
-      date.setMinutes(
-        date.getMinutes()+30
-      );
-
-    }
-
-  }
+const eventStart =
+new Date(
+event.start.dateTime
+);
 
 
-  return slots;
+const eventEnd =
+new Date(
+event.end.dateTime
+);
+
+
+return (
+slot >= eventStart &&
+slot < eventEnd
+);
+
+});
+
+
+if(!conflict){
+
+slots.push(slot);
+
+}
+
+}
+
+}
+
+}
+
+
+return slots.slice(0,10);
 
 }
 
