@@ -102,6 +102,38 @@ Return ONLY valid JSON.
 // BUDGET MISSING
 
 if (
+session.state === "OFFER_CONSULTATION"
+){
+
+const msg =
+message.toLowerCase().trim();
+
+
+if(
+[
+"yes",
+"yeah",
+"yep",
+"sure",
+"ok",
+"okay",
+"go ahead",
+"book",
+"book it",
+"schedule",
+"let's do it",
+"show slots"
+].some(x=>msg.includes(x))
+){
+
+return {
+action:"show_slots"
+};
+
+}
+
+}
+if (
   lead.industry &&
   !lead.budget
 ) {
@@ -153,40 +185,6 @@ if (
   return {
     action:"show_slots"
   };
-
-}
-
-
-if (
-session.state === "OFFER_CONSULTATION"
-){
-
-const msg =
-message.toLowerCase().trim();
-
-
-if(
-[
-"yes",
-"yeah",
-"yep",
-"sure",
-"ok",
-"okay",
-"go ahead",
-"book",
-"book it",
-"schedule",
-"let's do it",
-"show slots"
-].some(x=>msg.includes(x))
-){
-
-return {
-action:"show_slots"
-};
-
-}
 
 }
 
