@@ -1,8 +1,7 @@
 module.exports = function isSlotSelected(message){
 
-return (
-message.includes("Book this slot") &&
-message.includes("T")
+return message.startsWith(
+ "Book this slot"
 );
 
 };

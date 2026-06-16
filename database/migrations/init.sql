@@ -62,63 +62,6 @@ CREATE TABLE IF NOT EXISTS messages (
 
 
 
--- LEADS
-
-CREATE TABLE IF NOT EXISTS leads (
-
-    id SERIAL PRIMARY KEY,
-
-    conversation_id INTEGER,
-
-    name TEXT,
-
-    email TEXT,
-
-    company TEXT,
-
-    service TEXT,
-
-    requirements TEXT,
-
-    lead_score INTEGER DEFAULT 0,
-
-    created_at TIMESTAMP DEFAULT NOW(),
-
-
-    CONSTRAINT fk_lead_conversation
-    FOREIGN KEY(conversation_id)
-    REFERENCES conversations(id)
-    ON DELETE CASCADE
-
-);
-
-
-
--- BOOKINGS
-
-CREATE TABLE IF NOT EXISTS bookings (
-
-    id SERIAL PRIMARY KEY,
-
-    conversation_id INTEGER,
-
-    event_id TEXT,
-
-    meet_link TEXT,
-
-    slot TIMESTAMP,
-
-    status TEXT DEFAULT 'confirmed',
-
-    created_at TIMESTAMP DEFAULT NOW(),
-
-
-    CONSTRAINT fk_booking_conversation
-    FOREIGN KEY(conversation_id)
-    REFERENCES conversations(id)
-    ON DELETE CASCADE
-
-);
 CREATE TABLE IF NOT EXISTS leads (
 
     id SERIAL PRIMARY KEY,
@@ -144,7 +87,7 @@ CREATE TABLE IF NOT EXISTS leads (
 
     status VARCHAR(50)
     DEFAULT 'cold',
-
+state VARCHAR(100),
     created_at TIMESTAMP DEFAULT NOW(),
 
     updated_at TIMESTAMP DEFAULT NOW()

@@ -1,6 +1,6 @@
 const sendFollowupEmail =
 require(
-  "../../tools/sendFollowupEmailail"
+  "../../tools/sendFollowupEmail"
 );
 
 const {

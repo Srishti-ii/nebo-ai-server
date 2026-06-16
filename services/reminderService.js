@@ -6,7 +6,7 @@ require(
 const {
   getAllSessions,
 } = require(
-  "../memory/memoryService"
+  "../memory/conversationMemory"
 );
 const {
   sendReminderEmail

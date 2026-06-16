@@ -12,7 +12,8 @@ const {
 require("../database/leadRepository");
 const leadService =
 require("../database/leadRepository");
-
+const leadScorer =
+require("./leadScorer");
 const leadExtractor =
 require("./leadExtractor");
 
@@ -160,7 +161,8 @@ existingLead.state;
 
 
 
-
+session.lead.score =
+leadScorer(session.lead);
   // Calculate status AFTER extraction
 
   if (
@@ -219,7 +221,8 @@ if (
 
   session.state =
     "COLLECT_EMAIL";
-
+session.lead.state =
+session.state;
 
   return {
 
@@ -261,6 +264,8 @@ if(
 
 session.state="SHOW_SLOTS";
 
+session.lead.state =
+session.state;
 
 let slots =
 await getAvailableSlots();
@@ -477,7 +482,8 @@ response:
 
       session.state =
         "COMPLETED";
-
+session.lead.state =
+session.state;
 
 
       return {
@@ -511,15 +517,14 @@ response:
 
 };}
 
-
-
-
-
-  if (
+if (
   plan.action === "show_slots"
 ) {
 session.state =
 "SHOW_SLOTS";
+
+session.lead.state =
+session.state;
 
    let slots =
 await getAvailableSlots();
@@ -574,10 +579,9 @@ if (
 
 session.state =
 "OFFER_CONSULTATION";
-
-
 session.lead.state =
-"OFFER_CONSULTATION";
+session.state;
+
 
 await saveLead({
 

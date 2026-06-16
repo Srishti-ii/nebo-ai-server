@@ -41,12 +41,13 @@ budget,
 timeline,
 pain_points,
 score,
-status
+status,
+state
 )
 
 VALUES
 (
-$1,$2,$3,$4,$5,$6,$7,$8,$9,$10
+$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
 )
 
 ON CONFLICT(session_id)
@@ -62,6 +63,7 @@ timeline=$7,
 pain_points=$8,
 score=$9,
 status=$10,
+state=$11,
 updated_at=NOW()
 
 RETURNING *
@@ -76,7 +78,8 @@ lead.budget,
 lead.timeline,
 lead.painPoint,
 lead.score || 0,
-lead.status || "cold"
+lead.status || "cold",
+lead.state || null
 ]
 );
 

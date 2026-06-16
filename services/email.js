@@ -218,8 +218,8 @@ return {
     };
   }
 }
-
 module.exports = {
-  sendBookingEmail,
-  sendReminderEmail
+ resend,
+ sendBookingEmail,
+ sendReminderEmail
 };
