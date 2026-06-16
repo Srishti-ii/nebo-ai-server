@@ -29,6 +29,11 @@ await leadRepository.getLeadBySession(
 
 const session = {
 
+sessionId,
+
+state:
+existingLead?.state || null,
+
 history:
 history.map(msg => ({
   role:

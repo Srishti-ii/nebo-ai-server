@@ -158,21 +158,35 @@ if (
 
 
 if (
-  session.state ===
-  "OFFER_CONSULTATION"
-) {
+session.state === "OFFER_CONSULTATION"
+){
 
-  if (
-    msg.includes("yes") ||
-    msg.includes("sure") ||
-    msg.includes("okay")
-  ) {
+const msg =
+message.toLowerCase().trim();
 
-    return {
-      action:"show_slots"
-    };
 
-  }
+if(
+[
+"yes",
+"yeah",
+"yep",
+"sure",
+"ok",
+"okay",
+"go ahead",
+"book",
+"book it",
+"schedule",
+"let's do it",
+"show slots"
+].some(x=>msg.includes(x))
+){
+
+return {
+action:"show_slots"
+};
+
+}
 
 }
 

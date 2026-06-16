@@ -512,17 +512,27 @@ if(requestedDay){
 
   }
 
+if (
+  plan.action === "offer_consultation"
+) {
 
 
+session.state =
+"OFFER_CONSULTATION";
 
 
-  if (
-    plan.action === "offer_consultation"
-  ) {
+await saveLead({
 
+sessionId:
+session.sessionId,
 
-    session.state =
-      "OFFER_CONSULTATION";
+lead:{
+...session.lead,
+state:
+"OFFER_CONSULTATION"
+}
+
+});
 
 
 
@@ -629,7 +639,20 @@ if(requestedDay){
 
 
 
+if(
+session.state==="OFFER_CONSULTATION"
+){
 
+return {
+
+type:"text",
+
+response:
+"Great! Let me show you the available consultation slots."
+
+};
+
+}
 
   const response =
     await salesAgent(
