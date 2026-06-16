@@ -442,18 +442,14 @@ ${session.booking.email}
     }
 
 
+return {
 
+type:"text",
 
-    return {
+response:
+`Great, I'll help you schedule a consultation. Let me show you the available slots.`
 
-      type:"text",
-
-      response:
-      `Thanks! I've saved your email as ${plan.email}.`
-
-    };
-
-  }
+};}
 
 
 

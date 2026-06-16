@@ -137,26 +137,43 @@ if (
       "offer_consultation"
   };
 }
+const msg =
+message.toLowerCase();
+
+
+if (
+  msg.includes("book") ||
+  msg.includes("booking") ||
+  msg.includes("schedule") ||
+  msg.includes("consultation") ||
+  msg.includes("call") ||
+  msg.includes("meeting")
+) {
+
+  return {
+    action:"show_slots"
+  };
+
+}
+
+
 if (
   session.state ===
   "OFFER_CONSULTATION"
 ) {
 
-  const msg =
-    message.toLowerCase();
-
   if (
     msg.includes("yes") ||
     msg.includes("sure") ||
-    msg.includes("okay") ||
-    msg.includes("book") ||
-    msg.includes("schedule")
+    msg.includes("okay")
   ) {
+
     return {
-      action:
-        "show_slots"
+      action:"show_slots"
     };
+
   }
+
 }
 // USER SPECIFIED DATE/TIME
 const msg =
