@@ -15,9 +15,6 @@ email,
 service,
 slot
 }){
-let start;
-
-// ISO slot from frontend
 const start =
 new Date(
   slot.replace(" ", "T") +
