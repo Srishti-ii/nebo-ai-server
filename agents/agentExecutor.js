@@ -491,7 +491,7 @@ ${session.booking.email}
       slots,
 
 
-      message:
+      response:
       "I'd be happy to arrange a consultation. Here are the currently available slots:"
 
     };

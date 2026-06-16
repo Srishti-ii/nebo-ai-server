@@ -35,6 +35,10 @@ Return ONLY JSON.
   "painPoint": null,
   "service": null
 }
+  Never extract booking words as service.
+Words like:
+book, booking, consultation, meeting, call
+are NOT services.
 `;
 
   const result =

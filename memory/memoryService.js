@@ -57,7 +57,7 @@ VALUES($1,$2,$3)
 [
 conversation.id,
 role,
-content
+content || ""
 ]
 );
 
