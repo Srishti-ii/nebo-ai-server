@@ -17,8 +17,17 @@ slot
 }){
 
 
-const start =
-new Date(slot);
+const now = new Date();
+
+const indiaTime =
+new Date(
+ now.toLocaleString(
+  "en-US",
+  {
+   timeZone:"Asia/Kolkata"
+  }
+ )
+);
 
 
 const end =
