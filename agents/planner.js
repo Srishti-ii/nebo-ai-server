@@ -156,18 +156,18 @@ if (
       "discover_timeline"
   };
 }
-
-// EVERYTHING KNOWN
-
 if (
-  lead.industry &&
-  lead.budget &&
-  lead.timeline
-) {
-  return {
-    action:
-      "offer_consultation"
-  };
+lead.industry &&
+lead.budget &&
+lead.timeline &&
+session.state !== "OFFER_CONSULTATION" &&
+session.state !== "SHOW_SLOTS"
+){
+
+return {
+action:"offer_consultation"
+};
+
 }
 const msg =
 message.toLowerCase();

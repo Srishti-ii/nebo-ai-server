@@ -231,7 +231,55 @@ await planner(
  session,
  userMessage
 );
+// HANDLE CONSULTATION ACCEPTANCE BEFORE ANY OTHER PLAN
 
+if(
+session.state === "OFFER_CONSULTATION"
+){
+
+const msg =
+userMessage.toLowerCase().trim();
+
+
+if(
+[
+"yes",
+"yeah",
+"yep",
+"sure",
+"ok",
+"okay",
+"go ahead",
+"book",
+"book it",
+"schedule",
+"show slots",
+"let's do it"
+]
+.some(x=>msg.includes(x))
+){
+
+session.state="SHOW_SLOTS";
+
+
+let slots =
+await getAvailableSlots();
+
+
+return {
+
+type:"slots",
+
+slots,
+
+response:
+"Great! Here are the available consultation slots."
+
+};
+
+}
+
+}
   await saveLead({
 
     sessionId:
@@ -636,23 +684,6 @@ state:
     };
 
   }
-
-
-
-if(
-session.state==="OFFER_CONSULTATION"
-){
-
-return {
-
-type:"text",
-
-response:
-"Great! Let me show you the available consultation slots."
-
-};
-
-}
 
   const response =
     await salesAgent(
