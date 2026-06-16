@@ -229,6 +229,20 @@ return {
 };
 
 }
+const emailRegex =
+/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+
+const email =
+message.match(emailRegex);
+
+if(email){
+
+  return {
+    action:"capture_email",
+    email:email[0]
+  };
+
+}
   const result =
     await callGemini(prompt);
 console.log(

@@ -228,6 +228,11 @@ if (
 session.lead.state =
 session.state;
 
+await saveLead({
+  sessionId:session.sessionId,
+  lead:session.lead
+});
+
   return {
 
     type:"text",
@@ -364,7 +369,10 @@ ${JSON.stringify(
   if (
     plan.action === "capture_email"
   ) {
-
+console.log(
+  "CAPTURE EMAIL BRANCH",
+  plan
+);
 
     session.booking.email =
       plan.email;
@@ -489,6 +497,11 @@ response:
 session.lead.state =
 session.state;
 
+await saveLead({
+  sessionId:session.sessionId,
+  lead:session.lead
+});
+
 
       return {
 
@@ -529,6 +542,11 @@ session.state =
 
 session.lead.state =
 session.state;
+
+await saveLead({
+  sessionId:session.sessionId,
+  lead:session.lead
+});
 
    let slots =
 await getAvailableSlots();
