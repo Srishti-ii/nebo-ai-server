@@ -15,21 +15,16 @@ email,
 service,
 slot
 }){
-
 const start =
-new Date(slot);
-
+new Date(
+  slot + ":00+05:30"
+);
 
 const end =
 new Date(start);
 
-
 end.setMinutes(
-end.getMinutes()+30
-);
-
-end.setMinutes(
-end.getMinutes()+30
+ end.getMinutes()+30
 );
 
 
@@ -99,7 +94,6 @@ description:
 Email:${email}
 Service:${service}
 `,
-
 
 start:{
 dateTime:

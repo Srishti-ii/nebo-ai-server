@@ -41,7 +41,14 @@ async function sendBookingEmail({
 
             <p>
               <strong>Date & Time:</strong><br>
-              ${new Date(slot).toLocaleString("en-IN")}
+             ${new Date(slot).toLocaleString(
+"en-IN",
+{
+ timeZone:"Asia/Kolkata",
+ dateStyle:"medium",
+ timeStyle:"short"
+}
+)}
             </p>
 
             <p>
@@ -140,7 +147,14 @@ async function sendReminderEmail({
 
             <p>
               <strong>Date & Time:</strong><br>
-              ${new Date(slot).toLocaleString("en-IN")}
+              ${new Date(slot).toLocaleString(
+"en-IN",
+{
+ timeZone:"Asia/Kolkata",
+ dateStyle:"medium",
+ timeStyle:"short"
+}
+)}
             </p>
 
             <p>

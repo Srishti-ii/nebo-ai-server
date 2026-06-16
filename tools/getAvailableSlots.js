@@ -8,101 +8,108 @@ require("../services/availability");
 async function getAvailableSlots() {
 
 
-const indiaNow =
-new Date(
- new Date().toLocaleString(
- "en-US",
- {
-  timeZone:"Asia/Kolkata"
- }
- )
-);
+  const indiaNow =
+    new Date(
+      new Date().toLocaleString(
+        "en-US",
+        {
+          timeZone: "Asia/Kolkata"
+        }
+      )
+    );
 
 
+  const result =
+    await calendar.events.list({
 
-const result =
-await calendar.events.list({
-
-calendarId:
-process.env.GOOGLE_CALENDAR_ID,
-
+      calendarId:
+        process.env.GOOGLE_CALENDAR_ID,
 
 timeMin:
-new Date(
- indiaNow.getTime()
- -
- indiaNow.getTimezoneOffset()*60000
-).toISOString(),
+  new Date(
+    indiaNow.getTime() - (5.5 * 60 * 60 * 1000)
+  ).toISOString(),
 
 
 timeMax:
-new Date(
- indiaNow.getTime()
- +
- 7*24*60*60*1000
-).toISOString(),
+  new Date(
+    indiaNow.getTime() +
+    (7 * 24 * 60 * 60 * 1000)
+    -
+    (5.5 * 60 * 60 * 1000)
+  ).toISOString(),
 
 
-singleEvents:true,
+      singleEvents:true,
 
-orderBy:"startTime"
+      orderBy:"startTime"
 
-});
-
-
-
-const slots =
-generateSlots(
- result.data.items
-);
+    });
 
 
 
-return slots
-
-.filter(slot=>{
-
-
-const slotIndia =
-new Date(
- slot.toLocaleString(
- "en-US",
- {
- timeZone:"Asia/Kolkata"
- }
- )
-);
+  const slots =
+    generateSlots(
+      result.data.items
+    );
 
 
-return slotIndia > indiaNow;
+
+  const available =
+    slots
+    .filter(slot => {
 
 
-})
-
-.slice(0,10)
-
-.map(slot=>({
-
-value:
-slot.toLocaleString(
-"sv-SE",
-{
-timeZone:"Asia/Kolkata"
-}
-),
+      const slotIndia =
+        new Date(
+          slot.toLocaleString(
+            "en-US",
+            {
+              timeZone:"Asia/Kolkata"
+            }
+          )
+        );
 
 
-label:
-slot.toLocaleString(
-"en-IN",
-{
-timeZone:"Asia/Kolkata",
-dateStyle:"medium",
-timeStyle:"short"
-}
-)
+      return slotIndia > indiaNow;
 
-}));
+    })
+
+    .slice(0,10);
+
+
+
+  return available.map(slot => {
+
+
+    return {
+
+      // send IST value to frontend/backend
+      value:
+        slot.toLocaleString(
+          "sv-SE",
+          {
+            timeZone:"Asia/Kolkata"
+          }
+        ),
+
+
+      // display value
+      label:
+        slot.toLocaleString(
+          "en-IN",
+          {
+            timeZone:"Asia/Kolkata",
+            dateStyle:"medium",
+            timeStyle:"short"
+          }
+        )
+
+    };
+
+
+  });
+
 
 }
 

@@ -2,7 +2,8 @@ const {
   saveBooking
 } =
 require("../database/bookingRepository");
-
+const getAvailableSlots =
+require("../tools/getAvailableSlots");
 
 const {
   saveLead
@@ -245,37 +246,6 @@ await planner(
   );
 
 
-
-
-  if (
-    session.state === "SHOW_SLOTS" &&
-    isSlotSelected(userMessage)
-  ) {
-
-
-    session.booking.slot =
-      userMessage;
-
-
-    session.state =
-      "COLLECT_EMAIL";
-
-
-    return {
-
-      type:"text",
-
-      response:
-      "Perfect. What email should I send the consultation invitation to?"
-
-    };
-
-  }
-
-
-
-
-
   if (
     plan.action === "tool_call"
   ) {
@@ -339,54 +309,42 @@ ${JSON.stringify(
     if (
       session.state === "COLLECT_EMAIL"
     ) {
+const bookingResult =
+await runTools(
+[
+"bookMeeting"
+],
+{
+name:
+session.booking.name ||
+"Website Visitor",
+
+email:
+session.booking.email,
+
+service:
+"AI Consultation",
+
+slot:
+session.booking.slot
+}
+);
 
 
-      const results =
-      await runTools([
-
-        {
-
-          name:"bookMeeting",
-
-          payload:{
-
-            name:
-              session.booking.name ||
-              "Website Visitor",
-
-            email:
-              session.booking.email,
+const bookingResponse =
+bookingResult.bookMeeting;
 
 
-            service:
-              "AI Consultation",
+if(!bookingResponse.success){
 
+return {
 
-            slot:
-              session.booking.slot
+type:"text",
 
-          }
+response:
+"Sorry, I couldn't complete the booking. Please select another slot."
 
-        }
-
-      ]);
-
-
-
-      const bookingResult =
-        results[0].result;
-
-
-if(!bookingResult.success){
-
-  return {
-
-    type:"text",
-
-    response:
-    "Sorry, I couldn't complete the booking. Please select another slot."
-
-  };
+};
 
 }
 
@@ -434,11 +392,11 @@ if(!bookingResult.success){
 
 
           meetLink:
-            bookingResult.meetLink,
+            bookingResponse.meetLink,
 
 
           eventId:
-            bookingResult.eventId
+            bookingResponse.eventId
 
         });
 
@@ -473,7 +431,7 @@ if(!bookingResult.success){
 Your consultation has been booked successfully.
 
 Meet Link:
-${bookingResult.meetLink}
+${bookingResponse.meetLink}
 
 A confirmation email has been sent to:
 ${session.booking.email}
@@ -504,25 +462,41 @@ ${session.booking.email}
   if (
   plan.action === "show_slots"
 ) {
+session.state =
+"SHOW_SLOTS";
+
+   let slots =
+await getAvailableSlots();
 
 
-    const results =
-      await runTools([
-        {
-          name:"getAvailableSlots"
-        }
-      ]);
+const userText =
+userMessage.toLowerCase();
 
 
-    const slots =
-      results.getAvailableSlots;
+const requestedDay =
+userText.match(
+ /(\d{1,2})\s*(june|july|august|september|october|november|december)/i
+);
 
 
+if(requestedDay){
 
-    session.state =
-      "SHOW_SLOTS";
+ const day =
+ Number(requestedDay[1]);
 
 
+ slots =
+ slots.filter(slot=>{
+
+   const d =
+   new Date(slot.value);
+
+
+   return d.getDate()===day;
+
+ });
+
+}
 
     return {
 

@@ -1,11 +1,8 @@
-function isSlotSelected(
-  message
-) {
-  return (
-    message.includes("T") &&
-    message.includes("Z")
-  );
-}
+module.exports = function isSlotSelected(message){
 
-module.exports =
-  isSlotSelected;
+return (
+message.includes("Book this slot") &&
+message.includes("T")
+);
+
+};

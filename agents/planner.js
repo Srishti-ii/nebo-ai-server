@@ -67,7 +67,15 @@ Rules:
   "action":"offer_consultation"
 }
 
-5. If the user asks to schedule, book, arrange, or wants a consultation:
+5. If the user asks to schedule, book, arrange, wants a consultation,
+OR mentions a date/time preference:
+
+If email is missing:
+{
+  "action":"capture_email"
+}
+
+If email exists:
 {
   "action":"show_slots"
 }
@@ -149,6 +157,52 @@ if (
         "show_slots"
     };
   }
+}
+// USER SPECIFIED DATE/TIME
+const msg =
+message.toLowerCase();
+
+
+const dateWords =
+[
+"today",
+"tomorrow",
+"june",
+"july",
+"am",
+"pm",
+":00",
+":30"
+];
+
+
+if(
+ dateWords.some(word =>
+ msg.includes(word)
+ )
+){
+
+ return {
+   action:"show_slots"
+ };
+
+}
+// EMAIL REQUIRED BEFORE BOOKING
+
+if(
+ session.booking &&
+ !session.booking.email &&
+ (
+  message.toLowerCase().includes("book") ||
+  message.toLowerCase().includes("schedule") ||
+  message.toLowerCase().includes("consultation")
+ )
+){
+
+return {
+ action:"capture_email"
+};
+
 }
   const result =
     await callGemini(prompt);

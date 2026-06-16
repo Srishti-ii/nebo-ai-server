@@ -90,7 +90,8 @@ sessionId,
 role:"assistant",
 
 content:
-result.response
+result.response ||
+JSON.stringify(result)
 
 });
       res.json(result);

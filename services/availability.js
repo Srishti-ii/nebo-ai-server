@@ -1,138 +1,117 @@
-function generateSlots(events) {
+function generateSlots(events = []) {
 
-const slots=[];
+  const slots = [];
 
-const now = new Date();
+  const now =
+    new Date(
+      new Date().toLocaleString(
+        "en-US",
+        {
+          timeZone:"Asia/Kolkata"
+        }
+      )
+    );
 
-const indiaNow = new Date(
- now.toLocaleString(
-  "en-US",
-  {
-   timeZone:"Asia/Kolkata"
+
+  const startDate =
+    new Date(now);
+
+
+  // generate next 7 days
+  for(let day=0; day<7; day++){
+
+
+    const date =
+      new Date(startDate);
+
+    date.setDate(
+      startDate.getDate()+day
+    );
+
+
+    // 10 AM IST
+    date.setHours(
+      10,
+      0,
+      0,
+      0
+    );
+
+
+    // 5 PM IST
+    const end =
+      new Date(date);
+
+    end.setHours(
+      17,
+      0,
+      0,
+      0
+    );
+
+
+    while(date < end){
+
+
+      // skip already passed slots
+      if(date > now){
+
+
+        const conflict =
+          events.some(event=>{
+
+
+            if(!event.start?.dateTime)
+              return false;
+
+
+            const eventStart =
+              new Date(
+                event.start.dateTime
+              );
+
+
+            const eventEnd =
+              new Date(
+                event.end.dateTime
+              );
+
+
+            return (
+              date >= eventStart &&
+              date < eventEnd
+            );
+
+
+          });
+
+
+
+        if(!conflict){
+
+          slots.push(
+            new Date(date)
+          );
+
+        }
+
+      }
+
+
+      // 30 minute slots
+      date.setMinutes(
+        date.getMinutes()+30
+      );
+
+    }
+
   }
- )
-);
 
 
-for(let day=0; day<7; day++){
-
-const currentDay =
-new Date(indiaNow);
-
-
-currentDay.setDate(
- indiaNow.getDate()+day
-);
-
-
-// skip sunday
-if(currentDay.getDay()===0)
-continue;
-
-
-
-for(
-let hour=10;
-hour<18;
-hour++
-){
-
-for(
-let minute=0;
-minute<60;
-minute+=30
-){
-
-
-const slotStart =
-new Date(
- currentDay
-);
-
-
-slotStart.setHours(
-hour,
-minute,
-0,
-0
-);
-
-
-const indiaTime = new Date(
- slotStart.toLocaleString(
-  "en-US",
-  {
-   timeZone:"Asia/Kolkata"
-  }
- )
-);
-
-const currentIndiaTime = new Date(
- indiaNow.toLocaleString(
-  "en-US",
-  {
-   timeZone:"Asia/Kolkata"
-  }
- )
-);
-
-
-if(indiaTime.getTime() <= currentIndiaTime.getTime()){
- continue;
-}
-
-
-
-const slotEnd =
-new Date(slotStart);
-
-
-slotEnd.setMinutes(
-slotEnd.getMinutes()+30
-);
-
-
-
-const conflict =
-events.some(event=>{
-
-if(!event.start?.dateTime)
-return false;
-
-
-const start =
-new Date(
-event.start.dateTime
-);
-
-const end =
-new Date(
-event.end.dateTime
-);
-
-
-return (
-slotStart < end &&
-slotEnd > start
-);
-
-});
-
-
-
-if(!conflict)
-slots.push(slotStart);
-
-}
-
-}
+  return slots;
 
 }
 
 
-return slots.slice(0,10);
-
-}
-
-
-module.exports=generateSlots;
+module.exports =
+generateSlots;
