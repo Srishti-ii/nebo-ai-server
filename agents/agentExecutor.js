@@ -48,7 +48,6 @@ await leadService.getLeadBySession(
  session.sessionId
 );
 
-
 if(existingLead){
 
 session.lead = {
@@ -59,6 +58,14 @@ painPoint:
 existingLead.pain_points
 
 };
+
+
+if(existingLead.state){
+
+session.state =
+existingLead.state;
+
+}
 
 }
 
@@ -224,13 +231,6 @@ if (
   };
 
 }
-
-
-const plan =
-await planner(
- session,
- userMessage
-);
 // HANDLE CONSULTATION ACCEPTANCE BEFORE ANY OTHER PLAN
 
 if(
@@ -280,6 +280,14 @@ response:
 }
 
 }
+
+
+
+const plan =
+await planner(
+ session,
+ userMessage
+);
   await saveLead({
 
     sessionId:
@@ -564,21 +572,20 @@ if (
   plan.action === "offer_consultation"
 ) {
 
-
 session.state =
 "OFFER_CONSULTATION";
 
+
+session.lead.state =
+"OFFER_CONSULTATION";
 
 await saveLead({
 
 sessionId:
 session.sessionId,
 
-lead:{
-...session.lead,
-state:
-"OFFER_CONSULTATION"
-}
+lead:
+session.lead
 
 });
 
