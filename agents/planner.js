@@ -175,10 +175,6 @@ if (
   }
 
 }
-// USER SPECIFIED DATE/TIME
-const msg =
-message.toLowerCase();
-
 
 const dateWords =
 [
