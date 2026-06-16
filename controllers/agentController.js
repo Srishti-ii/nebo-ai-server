@@ -48,7 +48,8 @@ lead:
 existingLead || {},
 
 
-booking:{}
+booking:
+existingLead.booking || {}
 
 };
       await memory.saveMessage({

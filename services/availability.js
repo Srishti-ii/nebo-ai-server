@@ -58,11 +58,28 @@ minute,
 );
 
 
+const indiaTime = new Date(
+ slotStart.toLocaleString(
+  "en-US",
+  {
+   timeZone:"Asia/Kolkata"
+  }
+ )
+);
 
-if(
-slotStart <= indiaNow
-)
-continue;
+const currentIndiaTime = new Date(
+ indiaNow.toLocaleString(
+  "en-US",
+  {
+   timeZone:"Asia/Kolkata"
+  }
+ )
+);
+
+
+if(indiaTime.getTime() <= currentIndiaTime.getTime()){
+ continue;
+}
 
 
 

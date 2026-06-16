@@ -16,23 +16,17 @@ service,
 slot
 }){
 
-
-const now = new Date();
-
-const indiaTime =
-new Date(
- now.toLocaleString(
-  "en-US",
-  {
-   timeZone:"Asia/Kolkata"
-  }
- )
-);
+const start =
+new Date(slot);
 
 
 const end =
 new Date(start);
 
+
+end.setMinutes(
+end.getMinutes()+30
+);
 
 end.setMinutes(
 end.getMinutes()+30
@@ -130,10 +124,14 @@ extendedProperties:{
 },
 
 conferenceData:{
-createRequest:{
-requestId:
-Date.now().toString()
-}
+ createRequest:{
+  requestId:
+  "meet-"+Date.now(),
+
+  conferenceSolutionKey:{
+    type:"hangoutsMeet"
+  }
+ }
 }
 
 

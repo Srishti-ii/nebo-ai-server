@@ -191,12 +191,41 @@ existingLead.pain_points
 
 
 
-  const plan =
-    await planner(
-      session,
-      userMessage
-    );
+// HANDLE SLOT CLICK FIRST
 
+if (
+  session.state === "SHOW_SLOTS" &&
+  isSlotSelected(userMessage)
+) {
+
+  session.booking.slot =
+    userMessage.replace(
+      "Book this slot",
+      ""
+    ).trim();
+
+
+  session.state =
+    "COLLECT_EMAIL";
+
+
+  return {
+
+    type:"text",
+
+    response:
+    "Perfect. What email should I send the consultation invitation to?"
+
+  };
+
+}
+
+
+const plan =
+await planner(
+ session,
+ userMessage
+);
 
   await saveLead({
 
@@ -348,7 +377,18 @@ ${JSON.stringify(
         results[0].result;
 
 
+if(!bookingResult.success){
 
+  return {
+
+    type:"text",
+
+    response:
+    "Sorry, I couldn't complete the booking. Please select another slot."
+
+  };
+
+}
 
       const savedLead =
         await saveLead({
