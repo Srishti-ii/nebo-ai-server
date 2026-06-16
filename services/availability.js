@@ -33,9 +33,18 @@ function generateSlots(events) {
           );
         });
 
-        if (!conflict && slotStart > new Date()) {
-          slots.push(slotStart);
-        }
+       const now = new Date();
+
+now.setSeconds(0);
+now.setMilliseconds(0);
+
+
+if(
+!conflict &&
+slotStart.getTime() > now.getTime()
+){
+ slots.push(slotStart);
+}
       }
     }
   }
