@@ -67,7 +67,9 @@ async function callGemini(prompt) {
       );
 
 
-      await sleep(delay);
+  await sleep(
+ Math.pow(2, attempt) * 3000
+);
     }
   }
 

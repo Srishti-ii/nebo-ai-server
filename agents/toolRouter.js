@@ -1,6 +1,7 @@
 const toolRegistry =
 require("./toolRegistry");
 
+
 async function runTool(
 toolName,
 params = {}
@@ -19,24 +20,45 @@ params = {}
   return await tool(params);
 }
 
+
+
 async function runTools(
-toolNames,
+tools,
 params = {}
 ) {
 
   const results = {};
 
-  for (const toolName of toolNames) {
+
+  for (const tool of tools) {
+
+
+    const toolName =
+      typeof tool === "string"
+        ? tool
+        : tool.name;
+
+
+    const toolParams =
+      typeof tool === "object" &&
+      tool.payload
+        ? tool.payload
+        : params;
+
 
     results[toolName] =
       await runTool(
         toolName,
-        params
+        toolParams
       );
+
   }
 
+
   return results;
+
 }
+
 
 module.exports = {
   runTool,
