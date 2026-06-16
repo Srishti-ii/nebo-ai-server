@@ -462,8 +462,8 @@ ${session.booking.email}
 
 
   if (
-    plan.action === "show_slots"
-  ) {
+  plan.action === "show_slots"
+) {
 
 
     const results =
@@ -474,9 +474,8 @@ ${session.booking.email}
       ]);
 
 
-
     const slots =
-      results[0].result;
+      results.getAvailableSlots;
 
 
 
