@@ -84,26 +84,19 @@ timeMax:
 
     return {
 
-      // send IST value to frontend/backend
-      value:
-        slot.toLocaleString(
-          "sv-SE",
-          {
-            timeZone:"Asia/Kolkata"
-          }
-        ),
+   value: slot.toISOString(),
 
 
       // display value
-      label:
-        slot.toLocaleString(
-          "en-IN",
-          {
-            timeZone:"Asia/Kolkata",
-            dateStyle:"medium",
-            timeStyle:"short"
-          }
-        )
+     label:
+new Intl.DateTimeFormat(
+  "en-IN",
+  {
+    timeZone:"Asia/Kolkata",
+    dateStyle:"medium",
+    timeStyle:"short"
+  }
+).format(slot)
 
     };
 

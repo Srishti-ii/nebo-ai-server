@@ -210,15 +210,9 @@ console.log(
 );
 
 // HANDLE SLOT CLICK FIRST
-
 if (
- (
- session.state === "SHOW_SLOTS" ||
- session.state === "WAITING_FOR_SLOT"
- )
- &&
  isSlotSelected(userMessage)
-) {
+){
 //temp logs
     console.log("SLOT SELECTED");
 //temp logs
