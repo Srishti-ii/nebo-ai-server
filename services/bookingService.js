@@ -15,16 +15,30 @@ email,
 service,
 slot
 }){
+let start;
+
+// ISO slot from frontend
 const start =
 new Date(
-  slot + ":00+05:30"
+  slot.replace(" ", "T") +
+  "+05:30"
 );
 
 const end =
 new Date(start);
 
 end.setMinutes(
- end.getMinutes()+30
+  end.getMinutes() + 30
+);
+
+console.log(
+  "BOOKING SLOT RECEIVED:",
+  slot
+);
+
+console.log(
+  "START TIME:",
+  start.toISOString()
 );
 
 

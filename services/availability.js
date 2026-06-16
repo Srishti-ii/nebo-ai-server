@@ -88,7 +88,10 @@ slot < eventEnd
 
 
 if(!conflict){
-
+console.log(
+ "GENERATED SLOT:",
+ slot.toString()
+);
 slots.push(slot);
 
 }
