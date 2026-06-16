@@ -198,8 +198,16 @@ leadScorer(session.lead);
       2
     )
   );
-
-
+//temp logs
+console.log(
+  "STATE BEFORE SLOT CHECK:",
+  session.state
+);
+//temp logs
+console.log(
+  "USER MESSAGE:",
+  userMessage
+);
 
 // HANDLE SLOT CLICK FIRST
 
@@ -211,7 +219,9 @@ if (
  &&
  isSlotSelected(userMessage)
 ) {
-
+//temp logs
+    console.log("SLOT SELECTED");
+//temp logs
   session.booking.slot =
     userMessage.replace(
       "Book this slot",

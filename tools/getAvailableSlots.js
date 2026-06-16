@@ -75,7 +75,7 @@ timeMax:
 
     })
 
-    .slice(0,10);
+    .slice(0,30);
 
 
 

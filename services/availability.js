@@ -100,7 +100,7 @@ slots.push(slot);
 }
 
 
-return slots.slice(0,10);
+return slots.slice(0,30);
 
 }
 
