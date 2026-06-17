@@ -52,9 +52,11 @@ history.map(msg => ({
 lead:
 existingLead || {},
 
-
-booking:
-existingLead.booking || {}
+booking:{
+  slot:null,
+  email:null,
+  name:null
+}
 
 };
       await memory.saveMessage({

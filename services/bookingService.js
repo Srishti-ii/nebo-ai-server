@@ -1,4 +1,3 @@
-
 const calendar =
 require("./calendar");
 
@@ -15,27 +14,54 @@ email,
 service,
 slot
 }){
-const start =
-new Date(
-  slot.replace(" ", "T") +
-  "+05:30"
+
+
+if(!slot){
+
+throw new Error(
+"Slot missing. Please select a slot first."
 );
+
+}
+
+
+// HANDLE ISO SLOT FROM CHATBOT
+const start =
+new Date(slot);
+
+
+if(isNaN(start.getTime())){
+
+throw new Error(
+"Invalid slot time."
+);
+
+}
+
+
 
 const end =
 new Date(start);
 
 end.setMinutes(
-  end.getMinutes() + 30
+end.getMinutes()+30
+);
+
+
+
+console.log(
+"BOOKING SLOT RECEIVED:",
+slot
 );
 
 console.log(
-  "BOOKING SLOT RECEIVED:",
-  slot
-);
-
-console.log(
-  "START TIME:",
-  start.toISOString()
+"START IST:",
+start.toLocaleString(
+"en-IN",
+{
+timeZone:"Asia/Kolkata"
+}
+)
 );
 
 
@@ -79,9 +105,12 @@ new Date(event.start.dateTime)
 
 });
 
+
+
 if(conflict){
 
-const error = new Error(
+const error =
+new Error(
 "This slot has already been booked. Please choose another time."
 );
 
@@ -106,39 +135,43 @@ Email:${email}
 Service:${service}
 `,
 
+
 start:{
+
 dateTime:
 start.toISOString(),
 
 timeZone:
 "Asia/Kolkata"
+
 },
 
 
 end:{
+
 dateTime:
 end.toISOString(),
 
 timeZone:
 "Asia/Kolkata"
+
 },
-extendedProperties:{
- private:{
-  reminderSent:"false"
- }
-},
+
 
 conferenceData:{
- createRequest:{
-  requestId:
-  "meet-"+Date.now(),
 
-  conferenceSolutionKey:{
-    type:"hangoutsMeet"
-  }
- }
+createRequest:{
+
+requestId:
+"meet-"+Date.now(),
+
+conferenceSolutionKey:{
+type:"hangoutsMeet"
 }
 
+}
+
+}
 
 };
 
@@ -166,8 +199,8 @@ response.data
 ?.conferenceData
 ?.entryPoints
 ?.find(
- entry =>
- entry.entryPointType === "video"
+e =>
+e.entryPointType==="video"
 )
 ?.uri;
 

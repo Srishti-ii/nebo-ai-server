@@ -161,7 +161,9 @@ lead.industry &&
 lead.budget &&
 lead.timeline &&
 session.state !== "OFFER_CONSULTATION" &&
-session.state !== "SHOW_SLOTS"
+session.state !== "SHOW_SLOTS" &&
+session.state !== "COLLECT_EMAIL" &&
+session.state !== "COMPLETED"
 ){
 
 return {

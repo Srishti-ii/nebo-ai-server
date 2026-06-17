@@ -220,7 +220,20 @@ response:
 if (
   session.state === "COLLECT_EMAIL"
 ) {
+if(
+ !session.booking.slot
+){
 
+return {
+
+type:"text",
+
+response:
+"Please select a consultation slot first."
+
+};
+
+}
   const emailRegex =
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
