@@ -189,7 +189,7 @@ process.env.GOOGLE_CALENDAR_ID,
 resource:event,
 
 
-conferenceDataVersion:1
+conferenceDataVersion:1,
 sendUpdates:"all"
 });
 
