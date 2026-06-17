@@ -51,10 +51,13 @@ history.map(msg => ({
 
 lead:
 existingLead || {},
-
 booking:{
-  slot:null,
-  email:null,
+  slot:
+    existingLead?.bookingSlot || null,
+
+  email:
+    existingLead?.email || null,
+
   name:null
 }
 

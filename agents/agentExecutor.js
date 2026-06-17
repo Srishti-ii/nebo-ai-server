@@ -3,8 +3,10 @@ const {
 } =
 require("../database/bookingRepository");
 
+
 const getAvailableSlots =
 require("../tools/getAvailableSlots");
+
 
 const {
   saveLead
@@ -12,24 +14,31 @@ const {
 =
 require("../database/leadRepository");
 
+
 const leadService =
 require("../database/leadRepository");
+
 
 const leadScorer =
 require("./leadScorer");
 
+
 const leadExtractor =
 require("./leadExtractor");
 
+
 const planner =
 require("./planner");
+
 
 const {
   runTools,
 } = require("./toolRouter");
 
+
 const salesAgent =
 require("./salesAgent");
+
 
 
 async function agentExecutor(
@@ -37,161 +46,193 @@ async function agentExecutor(
   userMessage
 ) {
 
-  if (!session.lead) {
-    session.lead = {};
-  }
+
+if (!session.lead) {
+  session.lead = {};
+}
+
+
 
 const existingLead =
 await leadService.getLeadBySession(
  session.sessionId
 );
 
+
+
 if(existingLead){
 
 session.lead = {
+
   ...existingLead,
+
   painPoint:
-  existingLead.pain_points
+  existingLead.pain_points,
+
+  bookingSlot:
+  existingLead.bookingSlot
 };
 
-// restore state only if current session has no state
-if(
- existingLead.state
-){
+
+
+if(existingLead.state){
+
  session.state =
  existingLead.state;
-}
 
 }
 
-  if (!session.booking) {
-    session.booking = {};
-  }
+}
 
-  if (!session.followups) {
-    session.followups = {};
-  }
 
-  const leadData =
-    await leadExtractor(
-      session,
-      userMessage
-    );
 
-  Object.entries(
-    leadData
-  ).forEach(
-    ([key, value]) => {
-      if (
-        value === null ||
-        value === undefined
-      ) {
-        return;
-      }
-      if (
-        Array.isArray(value)
-      ) {
-        session.lead[key] =
-        [
-          ...(session.lead[key] || []),
-          ...value
-        ];
-        return;
-      }
-      session.lead[key] =
-        value;
-    }
-  );
+if (!session.booking) {
 
-  const lowerMessage =
-    userMessage.toLowerCase();
+session.booking = {};
 
-  if (
-    lowerMessage.includes("automation")
-  ) {
-    session.lead.painPoint =
-      "Automation";
-  }
+}
 
-  if (
-    lowerMessage.includes("crm")
-  ) {
-    session.lead.painPoint =
-      "CRM";
-  }
 
-  if (
-    lowerMessage.includes("chatbot")
-  ) {
-    session.lead.painPoint =
-      "Chatbot";
-  }
+
+if (!session.followups) {
+
+session.followups = {};
+
+}
+
+
+
+const leadData =
+await leadExtractor(
+ session,
+ userMessage
+);
+
+
+
+Object.entries(
+leadData
+).forEach(
+([key,value])=>{
+
+
+if(
+value===null ||
+value===undefined
+){
+return;
+}
+
+
+
+session.lead[key]=value;
+
+
+});
+
+
+
+
+
+const lowerMessage =
+userMessage.toLowerCase();
+
+
+
+if(lowerMessage.includes("automation")){
+
+session.lead.painPoint =
+"Automation";
+
+}
+
+
+if(lowerMessage.includes("crm")){
+
+session.lead.painPoint =
+"CRM";
+
+}
+
+
+if(lowerMessage.includes("chatbot")){
+
+session.lead.painPoint =
+"Chatbot";
+
+}
+
+
+
+
 
 session.lead.score =
 leadScorer(session.lead);
 
-  if (
-    (session.lead.score || 0) >= 60
-  ) {
-    session.lead.status =
-      "hot";
-  }
 
-  else if (
-    (session.lead.score || 0) >= 30
-  ) {
-    session.lead.status =
-      "warm";
-  }
 
-  else {
-    session.lead.status =
-      "cold";
-  }
+if(session.lead.score>=60){
 
-  console.log(
-    "CURRENT LEAD:",
-    JSON.stringify(
-      session.lead,
-      null,
-      2
-    )
-  );
+session.lead.status="hot";
 
-console.log(
-  "STATE BEFORE SLOT CHECK:",
-  session.state
-);
+}
+else if(session.lead.score>=30){
 
-console.log(
-  "USER MESSAGE:",
-  userMessage
-);
+session.lead.status="warm";
+
+}
+else{
+
+session.lead.status="cold";
+
+}
+
+
+
+
+
+/*
+ SLOT SELECTED
+*/
 
 if(
- session.state === "SHOW_SLOTS" ||
- session.state === "WAITING_FOR_SLOT"
+session.state==="SHOW_SLOTS" ||
+session.state==="WAITING_FOR_SLOT"
 ){
 
+
+const msg =
+userMessage.toLowerCase();
+
+
+
 if(
- userMessage.includes("Book this slot") ||
- userMessage.match(
- /(\d{1,2}\s\w+\s\d{4})/
- )
+msg.includes("book this slot") ||
+userMessage.match(
+/(\d{1,2}\s(june|july|august|september|october|november|december)\s\d{4})/i
+)
+
 ){
+
+
 const selectedSlot =
-userMessage.replace(
-  "Book this slot",
-  ""
-).trim();
+userMessage
+.replace(
+/book this slot/i,
+""
+)
+.trim();
+
 
 
 session.booking.slot =
 selectedSlot;
 
 
+
 session.lead.bookingSlot =
 selectedSlot;
+
 
 
 session.state =
@@ -202,16 +243,17 @@ session.lead.state =
 session.state;
 
 
-await saveLead({
-  sessionId: session.sessionId,
-  lead: session.lead
-});
-
 
 await saveLead({
-sessionId:session.sessionId,
-lead:session.lead
+
+sessionId:
+session.sessionId,
+
+lead:
+session.lead
+
 });
+
 
 
 return {
@@ -223,16 +265,28 @@ response:
 
 };
 
-}
 
 }
 
-if (
-  session.state === "COLLECT_EMAIL"
-) {
+}
+
+
+
+
+
+/*
+ EMAIL AFTER SLOT
+*/
+
 if(
- !session.booking.slot &&
- !session.lead.bookingSlot
+session.state==="COLLECT_EMAIL"
+){
+
+
+
+if(
+!session.booking.slot &&
+!session.lead.bookingSlot
 ){
 
 return {
@@ -247,153 +301,179 @@ response:
 }
 
 
-// restore slot from lead if session lost it
+
 
 if(
- !session.booking.slot &&
- session.lead.bookingSlot
+!session.booking.slot &&
+session.lead.bookingSlot
 ){
 
 session.booking.slot =
 session.lead.bookingSlot;
 
 }
-  const emailRegex =
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-  if(emailRegex.test(userMessage.trim())) {
-
-
-    console.log(
-      "EMAIL RECEIVED FOR BOOKING"
-    );
-
-
-    session.booking.email =
-      userMessage.trim();
-
-
-    session.lead.email =
-      userMessage.trim();
 
 
 
-    const bookingResult =
-    await runTools(
-    [
-      "bookMeeting"
-    ],
-    {
-      name:
-      session.booking.name ||
-      "Website Visitor",
+const emailRegex =
+/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      email:
-      session.booking.email,
 
-      service:
-      "AI Consultation",
 
-     slot:
+if(
+emailRegex.test(
+userMessage.trim()
+)
+
+){
+
+
+
+session.booking.email =
+userMessage.trim();
+
+
+
+session.lead.email =
+userMessage.trim();
+
+
+
+await saveLead({
+
+sessionId:
+session.sessionId,
+
+lead:
+session.lead
+
+});
+
+
+
+const bookingResult =
+await runTools(
+[
+"bookMeeting"
+],
+{
+
+name:
+"Website Visitor",
+
+email:
+session.booking.email,
+
+service:
+"AI Consultation",
+
+slot:
 session.booking.slot ||
 session.lead.bookingSlot
-    });
+
+}
+
+);
 
 
 
-    const bookingResponse =
-    bookingResult.bookMeeting;
+const bookingResponse =
+bookingResult.bookMeeting;
 
 
 
-    if(!bookingResponse.success){
-
-      return {
-
-        type:"text",
-
-        response:
-        "Sorry, that slot is no longer available. Please select another slot."
-
-      };
-
-    }
+if(!bookingResponse.success){
 
 
+return {
 
-    const savedLead =
-    await saveLead({
+type:"text",
 
-      sessionId:
-      session.sessionId,
+response:
+"Sorry, that slot is no longer available. Please select another slot."
 
-      lead:
-      session.lead
+};
 
-    });
+
+}
 
 
 
-    await saveBooking({
 
-      sessionId:
-      session.sessionId,
+const savedLead =
+await saveLead({
 
-      leadId:
-      savedLead.id,
+sessionId:
+session.sessionId,
 
-      name:
-      session.booking.name ||
-      "Website Visitor",
+lead:
+session.lead
 
-      email:
-      session.booking.email,
-
-      service:
-      "AI Consultation",
-
-     slot:
-session.booking.slot ||
-session.lead.bookingSlot,
-
-      meetLink:
-      bookingResponse.meetLink,
-
-      eventId:
-      bookingResponse.eventId
-
-    });
+});
 
 
 
-    session.state =
-    "COMPLETED";
+
+await saveBooking({
+
+sessionId:
+session.sessionId,
+
+leadId:
+savedLead.id,
+
+name:
+"Website Visitor",
+
+email:
+session.booking.email,
+
+service:
+"AI Consultation",
+
+slot:
+session.booking.slot,
+
+meetLink:
+bookingResponse.meetLink,
+
+eventId:
+bookingResponse.eventId
+
+});
 
 
-    session.lead.state =
-    "COMPLETED";
-
-
-    await saveLead({
-
-      sessionId:
-      session.sessionId,
-
-      lead:
-      session.lead
-
-    });
 
 
 
-    return {
-
-      type:
-      "booking_complete",
+session.state =
+"COMPLETED";
 
 
-      response:
+session.lead.state =
+"COMPLETED";
+
+
+
+await saveLead({
+
+sessionId:
+session.sessionId,
+
+lead:
+session.lead
+
+});
+
+
+
+
+
+return {
+
+type:"booking_complete",
+
+response:
 `
 Your consultation has been booked successfully.
 
@@ -404,17 +484,28 @@ A confirmation email has been sent to:
 ${session.booking.email}
 `
 
-    };
-
-  }
+};
 
 
 }
+
+
+}
+
+
+
+
+
 if(
-session.state === "OFFER_CONSULTATION"
+session.state==="OFFER_CONSULTATION"
 ){
+
+
 const msg =
-userMessage.toLowerCase().trim();
+userMessage.toLowerCase();
+
+
+
 if(
 [
 "yes",
@@ -425,203 +516,375 @@ if(
 "okay",
 "go ahead",
 "book",
-"book it",
 "schedule",
-"show slots",
-"let's do it"
+"show slots"
 ]
 .some(x=>msg.includes(x))
 ){
+
+
+
 session.state="SHOW_SLOTS";
+
+
 session.lead.state =
 session.state;
+
+
+
 let slots =
 await getAvailableSlots();
+
+
+
 return {
+
 type:"slots",
+
 slots,
+
 response:
 "Great! Here are the available consultation slots."
+
 };
+
+
 }
+
 }
-if(session.state === "COMPLETED"){
+
+
+
+
+
+if(session.state==="COMPLETED"){
+
 
 return {
 
 type:"text",
 
 response:
-"Your consultation is already booked. Check your email for the meeting details."
+"Your consultation is already booked. Check your email for meeting details."
+
+};
+
+
+}
+
+
+
+
+
+/*
+ PLANNER
+*/
+
+
+const plan =
+await planner(
+session,
+userMessage
+);
+
+
+
+
+await saveLead({
+
+sessionId:
+session.sessionId,
+
+lead:
+session.lead
+
+});
+
+
+
+
+
+/*
+ EMAIL GIVEN BEFORE SLOT
+*/
+
+
+if(
+plan.action==="capture_email"
+){
+
+
+const emailRegex =
+/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+const email =
+userMessage.match(emailRegex);
+
+
+
+if(email){
+
+
+session.booking.email =
+email[0];
+
+
+session.lead.email =
+email[0];
+
+
+
+await saveLead({
+
+sessionId:
+session.sessionId,
+
+lead:
+session.lead
+
+});
+
+
+}
+
+
+
+
+session.state =
+"SHOW_SLOTS";
+
+
+session.lead.state =
+"SHOW_SLOTS";
+
+
+
+let slots =
+await getAvailableSlots();
+
+
+
+return {
+
+type:"slots",
+
+slots,
+
+response:
+"Thanks. Here are the available consultation slots."
+
+};
+
+
+}
+
+
+
+
+
+
+if(
+plan.action==="show_slots"
+){
+
+
+session.state="SHOW_SLOTS";
+
+
+session.lead.state =
+session.state;
+
+
+
+await saveLead({
+
+sessionId:
+session.sessionId,
+
+lead:
+session.lead
+
+});
+
+
+
+let slots =
+await getAvailableSlots();
+
+
+
+return {
+
+type:"slots",
+
+slots,
+
+response:
+"I'd be happy to arrange a consultation. Here are the currently available slots:"
+
+};
+
+
+}
+
+
+
+
+
+
+if(
+plan.action==="offer_consultation"
+){
+
+
+session.state =
+"OFFER_CONSULTATION";
+
+
+session.lead.state =
+session.state;
+
+
+
+await saveLead({
+
+sessionId:
+session.sessionId,
+
+lead:
+session.lead
+
+});
+
+
+
+return {
+
+type:"text",
+
+response:
+"Based on what you've shared, a short consultation with our team would help us recommend the best solution. Would you like me to show available slots?"
 
 };
 
 }
-const plan =
-await planner(
- session,
- userMessage
+
+
+
+
+
+if(
+plan.action==="discover_business"
+){
+
+return {
+
+type:"text",
+
+response:
+"I'd love to learn more about your business. What does your company do?"
+
+};
+
+}
+
+
+
+
+
+if(
+plan.action==="discover_budget"
+){
+
+return {
+
+type:"text",
+
+response:
+"Do you have a rough budget range in mind for this project?"
+
+};
+
+}
+
+
+
+
+
+if(
+plan.action==="discover_timeline"
+){
+
+return {
+
+type:"text",
+
+response:
+"What timeline are you aiming for to launch this project?"
+
+};
+
+}
+
+
+
+
+
+
+if(
+plan.action==="answer_knowledge"
+){
+
+const knowledgeAgent =
+require("./knowledgeAgent");
+
+
+const answer =
+knowledgeAgent(
+userMessage
 );
 
-  await saveLead({
-    sessionId:
-    session.sessionId,
-    lead:
-      session.lead
-  });
 
-  console.log(
-    "PLANNER OUTPUT:",
-    plan
-  );
+if(answer){
 
-  if (
-    plan.action === "tool_call"
-  ) {
-    const results =
-      await runTools(
-        plan.tools,
-        {
-          session,
-          userMessage
-        }
-      );
-    const response =
-      await salesAgent(
-        session,
-        `
-User:
-${userMessage}
-Tool Results:
-${JSON.stringify(
-  results,
-  null,
-  2
-)}
-`
- );
-    return {
-      type:"text",
-      response
-    };
-  }
+return {
 
-if (
-  plan.action === "show_slots"
-) {
-session.state =
-"SHOW_SLOTS";
-session.lead.state =
-session.state;
-await saveLead({
-  sessionId:session.sessionId,
-  lead:session.lead
-});
-   let slots =
-await getAvailableSlots();
-const userText =
-userMessage.toLowerCase();
-const requestedDay =
-userText.match(
- /(\d{1,2})\s*(june|july|august|september|october|november|december)/i
+type:"text",
+
+response:answer
+
+};
+
+
+}
+
+}
+
+
+
+
+
+const response =
+await salesAgent(
+session,
+userMessage
 );
-if(requestedDay){
- const day =
- Number(requestedDay[1]);
- slots =
- slots.filter(slot=>{
-   const d =
-   new Date(slot.value);
-   return d.getDate()===day;
- });
+
+
+
+return {
+
+type:"text",
+
+response
+
+};
+
+
 }
-    return {
-      type:"slots",
-      slots,
-      response:
-      "I'd be happy to arrange a consultation. Here are the currently available slots:"
-    };
-  }
 
-if (
-  plan.action === "offer_consultation"
-) {
-session.state =
-"OFFER_CONSULTATION";
-session.lead.state =
-session.state;
-await saveLead({
-sessionId:
-session.sessionId,
-lead:
-session.lead
-});
 
-    return {
-      type:"text",
-      response:
-      "Based on what you've shared, a short consultation with our team would help us recommend the best solution. Would you like me to show available slots?"
-    };
-  }
-
-  if (
-    plan.action === "discover_business"
-  ) {
-    return {
-      type:"text",
-      response:
-      "I'd love to learn more about your business. What does your company do?"
-    };
-  }
-
-  if (
-    plan.action === "discover_timeline"
-  ) {
-    return {
-      type:"text",
-      response:
-      "What timeline are you aiming for to launch this project?"
-    };
-  }
-
-  if (
-    plan.action === "answer_knowledge"
-  ) {
-    const knowledgeAgent =
-      require("./knowledgeAgent");
-    const answer =
-      knowledgeAgent(
-        userMessage
-      );
-    if(answer){
-      return {
-        type:"text",
-        response:answer
-      };
-    }
-  }
-
-  if (
-    plan.action === "discover_budget"
-  ) {
-    return {
-      type:"text",
-      response:
-      "Do you have a rough budget range in mind for this project?"
-    };
-  }
-
-  const response =
-    await salesAgent(
-      session,
-      userMessage
-    );
-
-  return {
-    type:"text",
-    response
-  };
-}
 
 module.exports =
 agentExecutor;
