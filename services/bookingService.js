@@ -27,7 +27,9 @@ throw new Error(
 
 // HANDLE ISO SLOT FROM CHATBOT
 const start =
-new Date(slot);
+new Date(
+slot.replace("Z","+05:30")
+);
 
 
 if(isNaN(start.getTime())){
@@ -188,7 +190,7 @@ resource:event,
 
 
 conferenceDataVersion:1
-
+sendUpdates:"all"
 });
 
 

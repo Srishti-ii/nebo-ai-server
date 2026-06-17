@@ -359,8 +359,25 @@ session.lead
 });
 
 
+let bookingResult;
 
-const bookingResult =
+try {
+
+
+console.log(
+"BOOKING TOOL INPUT:",
+{
+slot:
+session.booking.slot ||
+session.lead.bookingSlot,
+
+email:
+session.booking.email
+}
+);
+
+
+bookingResult =
 await runTools(
 [
 "bookMeeting"
@@ -383,6 +400,34 @@ session.lead.bookingSlot
 }
 
 );
+
+
+console.log(
+"BOOKING RESULT:",
+bookingResult
+);
+
+
+}
+catch(error){
+
+
+console.error(
+"BOOKING FAILED:",
+error
+);
+
+
+return {
+
+type:"text",
+
+response:
+"Sorry, I could not complete the booking. Please try again."
+
+};
+
+}
 
 
 
