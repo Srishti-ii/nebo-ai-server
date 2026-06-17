@@ -31,8 +31,6 @@ const {
 const salesAgent =
 require("./salesAgent");
 
-const isSlotSelected =
-require("../tools/isSlotSelected");
 
 async function agentExecutor(
   session,
@@ -58,7 +56,6 @@ session.lead = {
 
 // restore state only if current session has no state
 if(
- !session.state &&
  existingLead.state
 ){
  session.state =
@@ -182,12 +179,19 @@ if(
  /(\d{1,2}\s\w+\s\d{4})/
  )
 ){
+const selectedSlot =
+userMessage.replace(
+  "Book this slot",
+  ""
+).trim();
+
 
 session.booking.slot =
-userMessage.replace(
-"Book this slot",
-""
-).trim();
+selectedSlot;
+
+
+session.lead.bookingSlot =
+selectedSlot;
 
 
 session.state =
@@ -196,6 +200,12 @@ session.state =
 
 session.lead.state =
 session.state;
+
+
+await saveLead({
+  sessionId: session.sessionId,
+  lead: session.lead
+});
 
 
 await saveLead({
@@ -221,7 +231,8 @@ if (
   session.state === "COLLECT_EMAIL"
 ) {
 if(
- !session.booking.slot
+ !session.booking.slot &&
+ !session.lead.bookingSlot
 ){
 
 return {
@@ -232,6 +243,19 @@ response:
 "Please select a consultation slot first."
 
 };
+
+}
+
+
+// restore slot from lead if session lost it
+
+if(
+ !session.booking.slot &&
+ session.lead.bookingSlot
+){
+
+session.booking.slot =
+session.lead.bookingSlot;
 
 }
   const emailRegex =
@@ -271,8 +295,9 @@ response:
       service:
       "AI Consultation",
 
-      slot:
-      session.booking.slot
+     slot:
+session.booking.slot ||
+session.lead.bookingSlot
     });
 
 
@@ -328,8 +353,9 @@ response:
       service:
       "AI Consultation",
 
-      slot:
-      session.booking.slot,
+     slot:
+session.booking.slot ||
+session.lead.bookingSlot,
 
       meetLink:
       bookingResponse.meetLink,
@@ -419,7 +445,18 @@ response:
 };
 }
 }
+if(session.state === "COMPLETED"){
 
+return {
+
+type:"text",
+
+response:
+"Your consultation is already booked. Check your email for the meeting details."
+
+};
+
+}
 const plan =
 await planner(
  session,
