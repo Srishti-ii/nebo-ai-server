@@ -115,12 +115,12 @@ leadData
 ).forEach(
 ([key,value])=>{
 
-
-if(
-value===null ||
-value===undefined
-){
-return;
+if (
+ value === null ||
+ value === undefined ||
+ value === ""
+) {
+ return;
 }
 
 
@@ -224,8 +224,10 @@ userMessage
 .trim();
 
 
-
 session.booking.slot =
+selectedSlot;
+
+session.lead.bookingSlot =
 selectedSlot;
 
 
@@ -289,13 +291,20 @@ if(
 !session.lead.bookingSlot
 ){
 
+session.state="SHOW_SLOTS";
+
+session.lead.state="SHOW_SLOTS";
+
+await saveLead({
+ sessionId:session.sessionId,
+ lead:session.lead
+});
+
+
 return {
-
 type:"text",
-
 response:
-"Please select a consultation slot first."
-
+"Please select a consultation slot first. Let me show available slots again."
 };
 
 }
