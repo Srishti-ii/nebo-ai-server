@@ -42,12 +42,14 @@ timeline,
 pain_points,
 score,
 status,
-state
+state,
+booking_slot
+
 )
 
 VALUES
 (
-$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
+$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12
 )
 
 ON CONFLICT(session_id)
@@ -64,6 +66,7 @@ pain_points=$8,
 score=$9,
 status=$10,
 state=$11,
+booking_slot=$12,
 updated_at=NOW()
 
 RETURNING *
@@ -79,7 +82,8 @@ lead.timeline,
 lead.painPoint,
 lead.score || 0,
 lead.status || "cold",
-lead.state || null
+lead.state || null,
+lead.bookingSlot || null
 ]
 );
 
