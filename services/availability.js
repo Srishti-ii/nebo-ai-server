@@ -3,10 +3,19 @@ function generateSlots(events=[]){
 const slots=[];
 
 
-const now = new Date();
+const nowIST =
+new Date(
+ new Date().toLocaleString(
+ "en-US",
+ {
+ timeZone:"Asia/Kolkata"
+ }
+ )
+);
 
 
-const startDate = new Date();
+const startDate =
+new Date(nowIST);
 
 
 startDate.setHours(
@@ -30,7 +39,7 @@ startDate.getDate()+i
 
 for(
 let hour=10;
-hour<=16;
+hour<=17;
 hour++
 ){
 
@@ -38,10 +47,8 @@ for(
 let minute of [0,30]
 ){
 
-
 const slot =
 new Date(day);
-
 
 slot.setHours(
 hour,
@@ -51,10 +58,8 @@ minute,
 );
 
 
-// skip past time today
-
 if(
-slot <= now
+slot <= nowIST
 )
 continue;
 
@@ -72,7 +77,6 @@ new Date(
 event.start.dateTime
 );
 
-
 const eventEnd =
 new Date(
 event.end.dateTime
@@ -88,10 +92,7 @@ slot < eventEnd
 
 
 if(!conflict){
-console.log(
- "GENERATED SLOT:",
- slot.toString()
-);
+
 slots.push(slot);
 
 }

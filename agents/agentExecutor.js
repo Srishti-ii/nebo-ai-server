@@ -49,15 +49,23 @@ await leadService.getLeadBySession(
 );
 
 if(existingLead){
+
 session.lead = {
-...existingLead,
-painPoint:
-existingLead.pain_points
+  ...existingLead,
+  painPoint:
+  existingLead.pain_points
 };
-if(existingLead.state){
-session.state =
-existingLead.state;
-}}
+
+// restore state only if current session has no state
+if(
+ !session.state &&
+ existingLead.state
+){
+ session.state =
+ existingLead.state;
+}
+
+}
 
   if (!session.booking) {
     session.booking = {};
@@ -163,33 +171,51 @@ console.log(
   userMessage
 );
 
-if (
- isSlotSelected(userMessage)
+if(
+ session.state === "SHOW_SLOTS" ||
+ session.state === "WAITING_FOR_SLOT"
 ){
-    console.log("SLOT SELECTED");
-  session.booking.slot =
-    userMessage.replace(
-      "Book this slot",
-      ""
-    ).trim();
 
-  session.state =
-    "COLLECT_EMAIL";
+if(
+ userMessage.includes("Book this slot") ||
+ userMessage.match(
+ /(\d{1,2}\s\w+\s\d{4})/
+ )
+){
+
+session.booking.slot =
+userMessage.replace(
+"Book this slot",
+""
+).trim();
+
+
+session.state =
+"COLLECT_EMAIL";
+
+
 session.lead.state =
 session.state;
 
+
 await saveLead({
-  sessionId:session.sessionId,
-  lead:session.lead
+sessionId:session.sessionId,
+lead:session.lead
 });
 
-  return {
-    type:"text",
-    response:
-    "Perfect. What email should I send the consultation invitation to?"
-  };
+
+return {
+
+type:"text",
+
+response:
+"Perfect. What email should I send the consultation invitation to?"
+
+};
+
 }
-// HANDLE EMAIL AFTER SLOT SELECTION BEFORE PLANNER
+
+}
 
 if (
   session.state === "COLLECT_EMAIL"
