@@ -725,21 +725,30 @@ response:
 
 
 
+if (session.state === "COMPLETED") {
 
+  const msg = userMessage.toLowerCase();
 
-if(session.state==="COMPLETED"){
+  const bookingKeywords = [
+    "book",
+    "schedule",
+    "slot",
+    "appointment",
+    "meeting"
+  ];
 
+  const tryingToBookAgain =
+    bookingKeywords.some(k => msg.includes(k));
 
-return {
+  if (tryingToBookAgain) {
+    return {
+      type: "text",
+      response:
+        "Your consultation is already booked. Check your email for meeting details."
+    };
+  }
 
-type:"text",
-
-response:
-"Your consultation is already booked. Check your email for meeting details."
-
-};
-
-
+  // otherwise continue processing
 }
 
 
