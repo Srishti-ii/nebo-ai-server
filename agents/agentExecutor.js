@@ -299,7 +299,7 @@ if(
   await runTools(
    ["bookMeeting"],
    {
-    name: "Website Visitor",
+    name: "Sir/Ma'am",
     email: session.booking.email,
     service: "AI Consultation",
     slot: session.booking.slot
@@ -343,7 +343,7 @@ if(
  await saveBooking({
   sessionId: session.sessionId,
   leadId: savedLead.id,
-  name: "Website Visitor",
+  name: "Sir/Ma'am",
   email: session.booking.email,
   service: "AI Consultation",
   slot: session.booking.slot,
@@ -494,7 +494,7 @@ await runTools(
 {
 
 name:
-"Website Visitor",
+"Sir/Ma'am",
 
 email:
 session.booking.email,
@@ -586,7 +586,7 @@ leadId:
 savedLead.id,
 
 name:
-"Website Visitor",
+"Sir/Ma'am",
 
 email:
 session.booking.email,
