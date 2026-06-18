@@ -2,44 +2,28 @@ function generateSlots(events=[]){
 
 const slots=[];
 
+// IST offset: +5 hours 30 minutes in ms
+const IST_OFFSET = 5.5 * 60 * 60 * 1000;
 
-const nowIST =
-new Date(
- new Date().toLocaleString(
- "en-US",
- {
- timeZone:"Asia/Kolkata"
- }
- )
-);
+// Current time in UTC
+const nowUTC = Date.now();
 
-
-const startDate =
-new Date(nowIST);
-
-
-startDate.setHours(
-10,
-0,
-0,
-0
-);
+// Get today's date in IST
+const nowIST = new Date(nowUTC + IST_OFFSET);
+const todayIST = {
+ year: nowIST.getUTCFullYear(),
+ month: nowIST.getUTCMonth(),
+ date: nowIST.getUTCDate(),
+ hours: nowIST.getUTCHours(),
+ minutes: nowIST.getUTCMinutes()
+};
 
 
 for(let i=0;i<7;i++){
 
-const day =
-new Date(startDate);
-
-
-day.setDate(
-startDate.getDate()+i
-);
-
-
 for(
 let hour=10;
-hour<=17;
+hour<17;
 hour++
 ){
 
@@ -47,19 +31,22 @@ for(
 let minute of [0,30]
 ){
 
-const slot =
-new Date(day);
+// Build the IST time, then convert to UTC for the Date object
+// IST time = UTC + 5:30, so UTC = IST - 5:30
+const istDate = new Date(Date.UTC(
+ todayIST.year,
+ todayIST.month,
+ todayIST.date + i,
+ hour - 5,
+ minute - 30,
+ 0,
+ 0
+));
 
-slot.setHours(
-hour,
-minute,
-0,
-0
-);
 
-
+// Skip past slots
 if(
-slot <= nowIST
+istDate.getTime() <= nowUTC
 )
 continue;
 
@@ -84,8 +71,8 @@ event.end.dateTime
 
 
 return (
-slot >= eventStart &&
-slot < eventEnd
+istDate >= eventStart &&
+istDate < eventEnd
 );
 
 });
@@ -93,7 +80,7 @@ slot < eventEnd
 
 if(!conflict){
 
-slots.push(slot);
+slots.push(istDate);
 
 }
 

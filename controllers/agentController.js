@@ -53,7 +53,7 @@ lead:
 existingLead || {},
 booking:{
   slot:
-    existingLead?.bookingSlot || null,
+    existingLead?.booking_slot || existingLead?.bookingSlot || null,
 
   email:
     existingLead?.email || null,

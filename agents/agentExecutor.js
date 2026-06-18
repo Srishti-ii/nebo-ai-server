@@ -70,9 +70,20 @@ session.lead = {
   existingLead.pain_points,
 
   bookingSlot:
-  existingLead.bookingSlot
+  existingLead.booking_slot || existingLead.bookingSlot
 };
 
+
+// Restore booking slot from DB
+if(
+ existingLead.booking_slot ||
+ existingLead.bookingSlot
+){
+ session.booking = session.booking || {};
+ session.booking.slot =
+  existingLead.booking_slot ||
+  existingLead.bookingSlot;
+}
 
 
 if(existingLead.state){
@@ -196,8 +207,7 @@ session.lead.status="cold";
 */
 
 if(
-session.state==="SHOW_SLOTS" ||
-session.state==="WAITING_FOR_SLOT"
+session.state==="SHOW_SLOTS"
 ){
 
 
@@ -205,14 +215,21 @@ const msg =
 userMessage.toLowerCase();
 
 
+// Detect slot selection:
+// 1. "Book this slot <slot>" prefix from button click
+// 2. ISO date string (from slot value)
+// 3. Date pattern like "18 Jun 2026, 10:00 am"
+const isSlotClick =
+ msg.includes("book this slot") ||
+ userMessage.match(
+  /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/
+ ) ||
+ userMessage.match(
+  /(\d{1,2}\s(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s\d{4})/i
+ );
 
-if(
-msg.includes("book this slot") ||
-userMessage.match(
-/(\d{1,2}\s(june|july|august|september|october|november|december)\s\d{4})/i
-)
 
-){
+if(isSlotClick){
 
 
 const selectedSlot =
@@ -226,11 +243,6 @@ userMessage
 
 session.booking.slot =
 selectedSlot;
-
-session.lead.bookingSlot =
-selectedSlot;
-
-
 
 session.lead.bookingSlot =
 selectedSlot;
@@ -256,6 +268,103 @@ session.lead
 
 });
 
+
+
+// If email already captured earlier, skip asking
+if(
+ session.booking.email ||
+ session.lead.email
+){
+
+ session.booking.email =
+  session.booking.email ||
+  session.lead.email;
+
+ session.lead.email =
+  session.booking.email;
+
+ // Directly book
+ let bookingResult;
+ try {
+
+  console.log(
+   "BOOKING TOOL INPUT (auto):",
+   {
+    slot: session.booking.slot,
+    email: session.booking.email
+   }
+  );
+
+  bookingResult =
+  await runTools(
+   ["bookMeeting"],
+   {
+    name: "Website Visitor",
+    email: session.booking.email,
+    service: "AI Consultation",
+    slot: session.booking.slot
+   }
+  );
+
+  console.log(
+   "BOOKING RESULT (auto):",
+   bookingResult
+  );
+
+ } catch(error) {
+  console.error(
+   "BOOKING FAILED (auto):",
+   error
+  );
+  return {
+   type: "text",
+   response:
+    "Sorry, I could not complete the booking. Please try again."
+  };
+ }
+
+ const bookingResponse =
+  bookingResult.bookMeeting;
+
+ if(!bookingResponse.success){
+  return {
+   type: "text",
+   response:
+    "Sorry, that slot is no longer available. Please select another slot."
+  };
+ }
+
+ const savedLead =
+  await saveLead({
+   sessionId: session.sessionId,
+   lead: session.lead
+  });
+
+ await saveBooking({
+  sessionId: session.sessionId,
+  leadId: savedLead.id,
+  name: "Website Visitor",
+  email: session.booking.email,
+  service: "AI Consultation",
+  slot: session.booking.slot,
+  meetLink: bookingResponse.meetLink,
+  eventId: bookingResponse.eventId
+ });
+
+ session.state = "COMPLETED";
+ session.lead.state = "COMPLETED";
+
+ await saveLead({
+  sessionId: session.sessionId,
+  lead: session.lead
+ });
+
+ return {
+  type: "booking_complete",
+  response:
+   `Your consultation has been booked successfully.\n\nMeet Link: ${bookingResponse.meetLink}\n\nA confirmation email has been sent to: ${session.booking.email}`
+ };
+}
 
 
 return {

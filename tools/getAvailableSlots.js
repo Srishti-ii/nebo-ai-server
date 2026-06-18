@@ -7,17 +7,10 @@ require("../services/availability");
 
 async function getAvailableSlots() {
 
+// IST offset: +5 hours 30 minutes in ms
+const IST_OFFSET = 5.5 * 60 * 60 * 1000;
 
-const nowIST =
-new Date(
-new Date().toLocaleString(
-"en-US",
-{
-timeZone:"Asia/Kolkata"
-}
-)
-);
-
+const nowUTC = Date.now();
 
 
 const result =
@@ -57,21 +50,12 @@ result.data.items
 const filtered =
 slots.filter(slot=>{
 
-
-const slotIST =
-new Date(
-slot.toLocaleString(
-"en-US",
-{
-timeZone:"Asia/Kolkata"
-}
-)
-);
-
-
+// Get IST hour from the UTC timestamp
+const istTime =
+new Date(slot.getTime() + IST_OFFSET);
 
 const hour =
-slotIST.getHours();
+istTime.getUTCHours();
 
 
 // ONLY 10 AM - 5 PM IST
@@ -86,7 +70,7 @@ return false;
 
 // remove past slots
 
-return slotIST > nowIST;
+return slot.getTime() > nowUTC;
 
 
 });
@@ -96,18 +80,6 @@ return slotIST > nowIST;
 return filtered
 .slice(0,30)
 .map(slot=>{
-
-
-const ist =
-new Date(
-slot.toLocaleString(
-"en-US",
-{
-timeZone:"Asia/Kolkata"
-}
-)
-);
-
 
 
 return {
@@ -125,7 +97,7 @@ timeZone:"Asia/Kolkata",
 dateStyle:"medium",
 timeStyle:"short"
 }
-).format(ist)
+).format(slot)
 
 };
 
