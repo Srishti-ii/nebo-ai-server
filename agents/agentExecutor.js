@@ -694,6 +694,13 @@ session.lead.state =
 session.state;
 
 
+await saveLead({
+sessionId:
+session.sessionId,
+lead:
+session.lead
+});
+
 
 let slots =
 await getAvailableSlots();
