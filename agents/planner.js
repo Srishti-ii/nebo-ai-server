@@ -134,13 +134,10 @@ action:"show_slots"
 
 }
 if (
-  lead.industry &&
-  !lead.budget
+  lead.budget === null ||
+  lead.budget === undefined
 ) {
-  return {
-    action:
-      "discover_budget"
-  };
+  return { action: "discover_budget" };
 }
 
 // INDUSTRY + BUDGET KNOWN
