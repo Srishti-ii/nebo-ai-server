@@ -6,7 +6,7 @@ const { sendRescheduleEmail, sendCancellationEmail } = require("./email");
 async function canReschedule(sessionId) {
   const booking = await getBookingBySession(sessionId);
   if (!booking) return { allowed: false, reason: "no_booking" };
-  if ((booking.reschedule_count || 0) >= 1) return { allowed: false, reason: "limit_reached" };
+
 
   // Check if meeting is within 2 hours
   const meetingTime = new Date(booking.slot).getTime();
