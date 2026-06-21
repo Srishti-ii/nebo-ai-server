@@ -6,8 +6,6 @@ const fs = require("fs");
 const tokenPath =
 path.join(__dirname, "..", "token.json");
 let auth;
-
-// PRIORITY 1: OAuth2 from env vars (supports Meet links)
 if (
 process.env.GOOGLE_CLIENT_ID &&
 process.env.GOOGLE_CLIENT_SECRET
@@ -17,7 +15,6 @@ const oauth2 =
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET
  );
-// Use refresh token from env or token.json
 let refreshToken =
  process.env.GOOGLE_REFRESH_TOKEN;
 
@@ -31,7 +28,7 @@ if (!refreshToken && fs.existsSync(tokenPath)) {
 oauth2.setCredentials({
  refresh_token: refreshToken
 });
-
+auth = oauth2;
 console.log("Calendar auth: OAuth2 (supports Meet links)");
 
 }
