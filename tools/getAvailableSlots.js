@@ -1,69 +1,51 @@
-const calendar =
-require("../services/calendar");
-const generateSlots =
-require("../services/availability");
+const calendar = require("../services/calendar");
+const generateSlots = require("../services/availability");
+
 async function getAvailableSlots() {
-// IST offset: +5 hours 30 minutes in ms
-const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+  // IST offset: +5 hours 30 minutes in ms
+  const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+  const nowUTC = Date.now();
 
-const nowUTC = Date.now();
-const result =
-await calendar.events.list({
-calendarId:
-process.env.GOOGLE_CALENDAR_ID,
-timeMin:
-new Date().toISOString(),
-timeMax:
-new Date(
-Date.now()
-+
-7*24*60*60*1000
-).toISOString(),
-singleEvents:true,
-orderBy:"startTime"
-});
-let slots =
-generateSlots(
-result.data.items
-);
-const filtered =
-slots.filter(slot=>{
-// Get IST hour from the UTC timestamp
-const istTime =
-new Date(slot.getTime() + IST_OFFSET);
+  let existingEvents = [];
 
-const hour =
+  try {
+    const result = await calendar.events.list({
+      calendarId: process.env.GOOGLE_CALENDAR_ID,
+      timeMin: new Date().toISOString(),
+      timeMax: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      singleEvents: true,
+      orderBy: "startTime"
+    });
+    existingEvents = result.data.items || [];
+  } catch (err) {
+    // If Google Calendar auth fails (invalid_grant, etc.), generate slots without conflict checking
+    console.error("CALENDAR FETCH ERROR (generating slots without conflict check):", err.message);
+    existingEvents = [];
+  }
 
-istTime.getUTCHours();
-// ONLY 10 AM - 5 PM IST
-if(
-hour < 10 ||
-hour >=17
-){
-return false;
+  let slots = generateSlots(existingEvents);
+
+  const filtered = slots.filter(slot => {
+    // Get IST hour from the UTC timestamp
+    const istTime = new Date(slot.getTime() + IST_OFFSET);
+    const hour = istTime.getUTCHours();
+    // ONLY 10 AM - 5 PM IST
+    if (hour < 10 || hour >= 17) {
+      return false;
+    }
+    return slot.getTime() > nowUTC;
+  });
+
+  return filtered.slice(0, 30).map(slot => {
+    return {
+      value: slot.toISOString(),
+      label: new Intl.DateTimeFormat("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(slot)
+    };
+  });
 }
 
-return slot.getTime() > nowUTC;
-});
-return filtered
-.slice(0,30)
-.map(slot=>{
-
-return {
-value:
-slot.toISOString(),
-label:
-new Intl.DateTimeFormat(
-"en-IN",
-{
-timeZone:"Asia/Kolkata",
-dateStyle:"medium",
-timeStyle:"short"
-}
-).format(slot)
-};
-});
-}
-module.exports =
-getAvailableSlots;
-getAvailableSlots;
+module.exports = getAvailableSlots;
