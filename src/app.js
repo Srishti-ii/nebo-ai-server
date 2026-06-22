@@ -31,7 +31,9 @@ app.use(
   origin:[
    "http://localhost:3000",
    "http://localhost:5173",
-   "https://neboengineering.vercel.app"
+   "https://neboengineering.vercel.app",
+   "https://neboengineering.in",
+  "https://www.neboengineering.in"
   ],
   credentials:true
  })
