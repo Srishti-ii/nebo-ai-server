@@ -1,5 +1,21 @@
 const callGemini = require("../services/gemini");
 
+// ─── Format a slot (ISO or human string) to IST for display ───
+function formatSlot(slot) {
+  if (!slot) return null;
+  try {
+    const d = new Date(slot);
+    if (isNaN(d.getTime())) return slot; // already human-readable, return as-is
+    return new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      dateStyle: "medium",
+      timeStyle: "short"
+    }).format(d);
+  } catch {
+    return slot;
+  }
+}
+
 const SYSTEM_PROMPT = `
 You are Nebo AI — a senior business consultant from Nebo IT Solutions.
 
@@ -49,6 +65,13 @@ async function salesAgent(session, userMessage, hint) {
   if (lead.company) knownInfo.push(`Company: ${lead.company}`);
   if (lead.name) knownInfo.push(`Client Name: ${lead.name}`);
   if (lead.email) knownInfo.push(`Client Email: ${lead.email}`);
+
+  // Include the selected booking slot (formatted to IST) so the LLM echoes the correct time
+  const rawSlot = (session.booking && session.booking.slot) || lead.bookingSlot;
+  if (rawSlot) {
+    const displaySlot = formatSlot(rawSlot);
+    if (displaySlot) knownInfo.push(`Selected Booking Slot (IST): ${displaySlot}`);
+  }
 
   // Get booking info if available
   const bookingInfo = [];
