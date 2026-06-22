@@ -37,8 +37,8 @@ async function rescheduleBooking({ sessionId, newSlot, name }) {
     console.error("Failed to delete old calendar event:", err.message);
   }
 
-  // Create new calendar event
-  const start = new Date(newSlot.replace("Z", "+05:30"));
+  // Create new calendar event — slot is already a correct UTC ISO string
+  const start = new Date(newSlot);
   if (isNaN(start.getTime())) {
     return { success: false, reason: "invalid_slot" };
   }

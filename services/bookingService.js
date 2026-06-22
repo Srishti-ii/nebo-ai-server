@@ -26,10 +26,10 @@ throw new Error(
 
 
 // HANDLE ISO SLOT FROM CHATBOT
+// Slot arrives as a correct UTC ISO string (e.g. "2026-06-24T05:30:00.000Z" for 11 AM IST)
+// Parse it directly — do NOT replace "Z" with "+05:30" as that double-offsets the time
 const start =
-new Date(
-slot.replace("Z","+05:30")
-);
+new Date(slot);
 
 
 if(isNaN(start.getTime())){
