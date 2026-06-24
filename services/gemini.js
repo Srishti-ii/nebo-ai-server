@@ -56,29 +56,19 @@ async function callGemini(prompt) {
       if (!isTemporary) {
         throw error;
       }
-
-
-      const delay =
-        Math.pow(2, attempt) * 2000;
-
-
-      console.log(
-        `Gemini retry in ${delay}ms`
-      );
-
-
   await sleep(
  Math.pow(2, attempt) * 3000
 );
     }
   }
 
+ console.error(
+    "Gemini unavailable:",
+    lastError?.message
+  );
 
-  throw lastError;
+  return "Sorry, we're unable to connect right now due to a temporary server issue. Please try again in a few moments.";
 }
-
-
-
 
 module.exports =
 callGemini;
